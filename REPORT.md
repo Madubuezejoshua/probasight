@@ -8,7 +8,8 @@ A code path existing is not proof that it ran. Anything that could not be execut
 because it needs a funded wallet, a human wallet approval, or a market state that does not
 currently exist — is marked **BLOCKED**, never PASS.
 
-Audit environment: Windows 11, Node 24.20.0, npm 11.19.0, Next.js 15.5.4.
+Audit environment: Windows 11, Node 24.20.0, npm 11.19.0, Next.js **15.5.25** (upgraded
+during this audit from 15.5.4, which carried a critical RCE — see Bug 19).
 Panta key in use: `pk_live_…` (production catalog). Groq key configured. Helius mainnet RPC.
 
 ---
@@ -34,6 +35,11 @@ detail-less `400` for valid requests (measured below). This audit added error
 reclassification and bounded retry for idempotent reads, which raised market-detail
 reliability from **75% raw to 12/12 through the application**.
 
+**Two critical defects were found and fixed during this audit.** Four API routes — every
+transaction builder — had never been committed because of an unanchored `.gitignore`
+pattern, so the deployed application could not build a trade, a market creation or a claim.
+And the pinned Next.js version carried a critical RCE. Both are fixed and covered by tests.
+
 **Unresolved blockers:** none in software. Two external prerequisites remain, both yours:
 a funded wallet for the signature, and a resolved market where you hold the winning side
 for a live claim demo.
@@ -49,7 +55,7 @@ step that leads to the signature is verified against production, and the transac
 would be signed has been constructed and validated. But signing needs your wallet and your
 funds, so claiming a completed on-chain trade would be a fabrication.
 
-Why not "Not ready": nothing is missing or broken in the software. Lint, typecheck, 129
+Why not "Not ready": nothing is missing or broken in the software. Lint, typecheck, 133
 tests and the production build all pass; all five pages and all 20 API routes respond
 correctly against live production data.
 
@@ -142,7 +148,7 @@ signatures with `TX_MISMATCH`. Verified in `useClaimFlow.ts`, which branches on 
   on-chain revert. 16 unit tests cover this.
 - **Upstream instability absorbed.** See Bugs 15 and 16 — this audit's most substantive fix.
 - **Quality gate:** lint 0 errors / 0 warnings, `tsc --noEmit` 0 errors (strict),
-  **129 tests across 9 files**, production build clean, 102 kB shared First Load JS.
+  **133 tests across 10 files**, production build clean, 102 kB shared First Load JS.
 
 ### 4.3 Product & User Experience
 
@@ -404,7 +410,7 @@ would break the guarantee that analysis uses only the Panta snapshot.
 | --- | --- | --- |
 | Lint | `npx eslint .` | **PASS** — 0 errors, 0 warnings |
 | Typecheck | `npx tsc --noEmit` | **PASS** — 0 errors, strict mode |
-| Unit tests | `npx vitest run` | **PASS — 129 passed / 129, 9 files** |
+| Unit tests | `npx vitest run` | **PASS — 133 passed / 133, 10 files** |
 | Production build | `npx next build` | **PASS** — 28 routes, 102 kB shared First Load JS |
 
 | Test file | Tests | Covers |
@@ -418,6 +424,7 @@ would break the guarantee that analysis uses only the Panta snapshot.
 | `display.test.ts` | 11 | Market-name resolution and truncation |
 | `panta-client-retry.test.ts` | 8 | GET retries transient, POST never does, real validation errors never retried, fail-closed without a key |
 | `ai-guard.test.ts` | 6 | Refusal of markets with no question text |
+| `repo-integrity.test.ts` | 4 | Every source file and API route is tracked by git; gitignore cannot swallow nested source dirs |
 
 **No test signs a transaction, spends funds, or creates a market.**
 
@@ -497,13 +504,16 @@ live only in the gitignored `.env.local`.
 
 ## 15. Bugs Found
 
-Bugs 1–14 were found in earlier sessions and are recorded in `docs/QA_REPORT.md`. Bugs 15–17
+Bugs 1–14 were found in earlier sessions and are recorded in `docs/QA_REPORT.md`. Bugs 15–20
 were found during **this** audit.
 
 | # | Bug | Severity | Fix | Retest |
 | --- | --- | --- | --- | --- |
 | 15 | **Transient upstream `400` reported as the user's fault.** Panta intermittently returns a bare `{"code":"INVALID_MARKET_PARAMS"}` for valid requests. It was surfaced as "Some of the submitted values were rejected", non-retryable — blaming input that was correct and denying a retry | **High** | Detail-less params errors are reclassified `UPSTREAM_TRANSIENT` (502, retryable) with accurate copy. Errors carrying `field`/`fields`/`message` keep their code and stay non-retryable | **PASS** — 6 new unit tests; live: route now returns `UPSTREAM_TRANSIENT retryable=true` on the bare form and `NOT_CLAIMABLE` on the real one |
 | 16 | **No retry for that instability**, so roughly a quarter of market-detail loads failed | **High** | Bounded retry (3 attempts, 150/400 ms backoff) for **GET only**. POST is never auto-retried: quote/build would mint duplicate sessions and submit/report/register must not fire twice | **PASS** — market detail 75% raw → **12/12** through the route; showpiece page **8/8**; 8 new unit tests pin the semantics |
+| 18 | **Four API routes were never committed.** `.gitignore` contained an unanchored `build`, which matches a directory named `build` at ANY depth. It silently excluded `trade/build`, `create/build`, `claims/winnings/build` and `claims/creator-fees/build` — **every transaction-builder route**. The deployed app could not build a trade, a market creation, or any claim. Local checks all passed because the files were on disk; the audit's own "all 20 routes reachable" check read the filesystem rather than git, so it missed this too | **CRITICAL** | Anchored every build-output pattern to the repository root (`/build`, `/node_modules`, `/.next`, `/out`, `/coverage`) and committed the four routes. Added `tests/repo-integrity.test.ts`, which fails if any source file or route handler on disk is untracked, and asserts the gitignore cannot re-swallow a nested `build` directory | **PASS** — test proven to fail before the fix and pass after; production build now emits all 20 API routes |
+| 19 | **Next.js 15.5.4 carried a critical RCE plus 30 further advisories**, flagged by Vercel at deploy time. Several were directly relevant: RCE in the Image Optimization API via AVIF, and a DoS via `remotePatterns` — which this app sets to `**` | **CRITICAL** | Upgraded to **15.5.25** (the patch `npm audit` identifies, non-semver-major) and `sharp` to 0.35.4, clearing its own high-severity libvips/libheif advisories | **PASS** — `npm audit` critical count 1 → **0**, high 2 → 1; full gate re-run green |
+| 20 | **Next 16 evaluated and rejected** (recorded so the decision is not re-litigated) | — | Next 16.3.5 typechecks, builds and passes all 133 tests, and would clear the last high (`postcss`). It was **not** adopted: its ESLint config enables `react-hooks/set-state-in-effect`, which flags 10 legitimate sites (countdown timers, cache reads, bounded polling), and a major framework change immediately before submission is poor risk. The remaining `postcss` advisory is build-time CSS tooling exploited via attacker-controlled CSS, which this project does not process | **N/A** — reverted to 15.5.25, gate green |
 | 17 | **Test mock reused one `Response`**, whose body can only be read once, so the retry test failed with "Body is unusable" | Low (test-only) | Mock builds a fresh `Response` per call | **PASS** — 8/8 retry tests green |
 
 **Also corrected during this audit:** an earlier session recorded a CRITICAL "AI hallucination".
@@ -549,7 +559,8 @@ inlines a value into the browser bundle.
 
 ## 18. Vercel Deployment Checklist
 
-- [x] Production build passes (`npx next build`, 28 routes)
+- [x] Production build passes (`npx next build`) — **all 20 API routes present**, verified after Bug 18
+- [x] Next.js on a patched version (15.5.25); `npm audit` critical count 0
 - [x] No `localhost` dependency in application code (only in local test scripts, untracked)
 - [x] No filesystem persistence — no database, no disk writes
 - [x] No hardcoded RPC — read from `NEXT_PUBLIC_SOLANA_RPC_URL`
@@ -644,7 +655,7 @@ as real usage.
 - [x] Panta integration explained (`README.md`, `docs/ARCHITECTURE.md`, `docs/SUBMISSION.md`)
 - [x] "Powered by Panta" on every Panta-powered surface, exact wording
 - [x] Working prototype — all pages live against production Panta
-- [x] Quality gate green (lint, typecheck, 129 tests, build)
+- [x] Quality gate green (lint, typecheck, 133 tests, build)
 - [ ] Deployed URL — **you**
 - [ ] Official Colosseum submission — **you**
 - [ ] Panta Sidetrack submission on Superteam Earn — **you**
