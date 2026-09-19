@@ -1,0 +1,321 @@
+@import "tailwindcss";
+
+/*
+ * Panta Pulse design system.
+ *
+ * Dark-first professional terminal. The brand accent is teal; YES/NO green and
+ * red are semantic state colours only and are never used as brand surfaces.
+ */
+
+@theme {
+  --color-bg: #080b10;
+  --color-surface: #0e131a;
+  --color-surface-2: #131a23;
+  --color-elevated: #171f2a;
+  --color-border-subtle: #222b36;
+  --color-border-strong: #2d3846;
+  --color-text: #f5f7fa;
+  --color-muted: #8a96a8;
+  --color-faint: #5d6878;
+
+  --color-accent: #4fe0d0;
+  --color-accent-bright: #74ece0;
+  --color-accent-dim: #1d4a47;
+
+  --color-yes: #22c55e;
+  --color-yes-dim: #14341f;
+  --color-no: #f43f5e;
+  --color-no-dim: #3d1220;
+
+  --color-warning: #f59e0b;
+  --color-warning-dim: #3a2a08;
+  --color-danger: #ef4444;
+  --color-success: #22c55e;
+
+  --radius-card: 12px;
+  --radius-control: 10px;
+  --radius-chip: 8px;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  * {
+    border-color: var(--color-border-subtle);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    /* Guards against any single wide child creating a horizontal scrollbar. */
+    overflow-x: hidden;
+  }
+
+  /* Numeric emphasis: prices and share counts align in columns. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--color-accent-dim);
+    color: var(--color-text);
+  }
+
+  /* Scrollbars tuned to the terminal surface rather than the OS default. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: 999px;
+    border: 2px solid var(--color-bg);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3c4959;
+  }
+}
+
+@layer components {
+  .pp-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+  }
+
+  .pp-panel {
+    background-color: var(--color-surface-2);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-card);
+  }
+
+  .pp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: var(--radius-chip);
+    border: 1px solid var(--color-border-subtle);
+    background-color: var(--color-surface-2);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-muted);
+    text-transform: uppercase;
+  }
+
+  .pp-input {
+    width: 100%;
+    border-radius: var(--radius-control);
+    border: 1px solid var(--color-border-subtle);
+    background-color: var(--color-bg);
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    transition: border-color 120ms ease;
+  }
+  .pp-input::placeholder {
+    color: var(--color-faint);
+  }
+  .pp-input:hover:not(:disabled) {
+    border-color: var(--color-border-strong);
+  }
+  .pp-input:focus {
+    border-color: var(--color-accent);
+    outline: none;
+    box-shadow: 0 0 0 1px var(--color-accent-dim);
+  }
+  .pp-input:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .pp-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 0.375rem;
+  }
+
+  .pp-hint {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    line-height: 1.5;
+  }
+
+  .pp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-control);
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.625rem 1rem;
+    transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .pp-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .pp-btn-primary {
+    background-color: var(--color-accent);
+    color: #04201d;
+  }
+  .pp-btn-primary:hover:not(:disabled) {
+    background-color: var(--color-accent-bright);
+  }
+
+  .pp-btn-secondary {
+    background-color: var(--color-surface-2);
+    border-color: var(--color-border-subtle);
+    color: var(--color-text);
+  }
+  .pp-btn-secondary:hover:not(:disabled) {
+    background-color: var(--color-elevated);
+    border-color: var(--color-border-strong);
+  }
+
+  .pp-btn-ghost {
+    background-color: transparent;
+    color: var(--color-muted);
+  }
+  .pp-btn-ghost:hover:not(:disabled) {
+    color: var(--color-text);
+    background-color: var(--color-surface-2);
+  }
+
+  /* Skeletons animate only when the viewer has not asked for reduced motion. */
+  .pp-skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-surface-2) 25%,
+      var(--color-elevated) 37%,
+      var(--color-surface-2) 63%
+    );
+    background-size: 400% 100%;
+    animation: pp-shimmer 1.4s ease infinite;
+    border-radius: 6px;
+  }
+
+  @keyframes pp-shimmer {
+    0% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0 50%;
+    }
+  }
+
+  /* Bottom sheet used for mobile trading. */
+  @keyframes pp-sheet-in {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  .pp-sheet {
+    animation: pp-sheet-in 220ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  @keyframes pp-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .pp-fade {
+    animation: pp-fade-in 160ms ease;
+  }
+
+  /* Quiet status pulse. Deliberately slow: nothing here should read as a casino. */
+  @keyframes pp-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.45;
+    }
+  }
+  .pp-live-dot {
+    animation: pp-pulse 2.4s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * Wallet adapter modal restyled to the Panta Pulse surface.
+ * The library ships a light-leaning default that would break the terminal look.
+ */
+.wallet-adapter-modal-wrapper {
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border-subtle) !important;
+  border-radius: var(--radius-card) !important;
+  font-family: var(--font-sans) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6) !important;
+}
+.wallet-adapter-modal-title {
+  color: var(--color-text) !important;
+  font-size: 1.125rem !important;
+}
+.wallet-adapter-modal-list li {
+  background-color: var(--color-surface-2) !important;
+  border: 1px solid var(--color-border-subtle) !important;
+  border-radius: var(--radius-control) !important;
+}
+.wallet-adapter-modal-list .wallet-adapter-button {
+  background-color: transparent !important;
+  color: var(--color-text) !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+}
+.wallet-adapter-modal-list-more {
+  color: var(--color-accent) !important;
+}
+.wallet-adapter-modal-button-close {
+  background-color: var(--color-surface-2) !important;
+}
+.wallet-adapter-modal-button-close svg {
+  fill: var(--color-muted) !important;
+}
