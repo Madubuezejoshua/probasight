@@ -6,14 +6,33 @@ Written for: whoever is presenting this to the Colosseum / Panta Sidetrack judge
 
 ---
 
+## Demo markets — verified live during the final audit
+
+All three are **named** and in the **primary** phase, so they are tradable and readable.
+Markets change phase without warning: re-check all three immediately before recording and
+keep the backups open in other tabs.
+
+| Role | Market | Id |
+| --- | --- | --- |
+| **PRIMARY** | *Will Prime Minister Andy Burnham formally announce a delay, reduction, or full cancellation…* | `FFFcvy12DfhFMQTPieuGFHgzdXwkk24oXTRpbpXJPF9` |
+| **BACKUP 1** | *Will Super Micro Computer's stock price ($SMCI) close at or above $37.00…* | `dsaUrqmxNRtGeEhYZv4hPeWRKXQbVY6LcxgDrA6cUSe` |
+| **BACKUP 2** | *Will Cisco Systems (CSCO) report cumulative FY2026 AI infrastructure orders…* | `vQZWPdVNZPdDKnXQG822J4zKWbHthUq1ydeazaq475X` |
+
+> **Catalog caveat, worth knowing before a judge asks.** Most live Panta markets currently
+> return no question text on the list endpoint. Panta Pulse merges market detail into the
+> leading cards so real questions appear, but some rows are genuinely nameless upstream and
+> show their market id instead. Say exactly that if asked — it is upstream data, and
+> inventing a title would be fabrication.
+
+---
+
 ## Before you start
 
 - [ ] `.env.local` filled in with a real `PANTA_API_KEY` and `GROQ_API_KEY`
 - [ ] `npm run build && npm run start`, or open the deployed URL
 - [ ] Wallet connected **and already funded** (a few USDC + 0.05 SOL) — do not spend demo
       time on a faucet
-- [ ] **Pick two backup markets.** Markets close. Have a second and third `marketId` ready,
-      preferably in different categories, all in the `primary` phase
+- [ ] All three markets above re-confirmed as `primary`
 - [ ] Pre-run the AI analysis once on your chosen market so it is warm in session cache —
       then click **Regenerate** on camera so the judges see it generate live
 - [ ] Browser zoom at 100%, devtools closed, notifications off
@@ -38,12 +57,14 @@ Point at the trending cards.
 
 Click **Explore Markets**.
 
-> "Filter by category and by market phase — both are real Panta query parameters."
+> "Category filtering is a real Panta query parameter."
 
 Click a category chip. Click **Primary**.
 
-> "Search filters what's loaded, because Panta's catalog endpoint doesn't expose a text
-> search. We label it that way rather than pretending otherwise."
+> "Phase is filtered here on each market's actual phase field, because Panta's status
+> parameter doesn't filter reliably — we tested it and it returns cancelled and resolved
+> rows for a primary query. We'd rather be correct than pretend. Same with search: Panta's
+> catalog has no text-search parameter, so the box filters what's loaded and says so."
 
 ### 0:40–1:00 — Market detail
 
@@ -100,9 +121,10 @@ Click **Trade YES**, approve in the wallet, and narrate the status line as it mo
 
 When it completes:
 
-> "Signature, Panta order status, and attribution status. That trade-reporting step is
-> explicit — it's how Panta attributes volume to an integration, and we treat it as a
-> first-class step rather than a side effect."
+> "Signature, Panta order status, and attribution status — re-checkable right here. That
+> reporting step is how Panta attributes volume to an integration, so we treat it as a
+> first-class step rather than a side effect. Panta also embeds an attribution memo in the
+> transaction itself."
 
 ### 2:30–2:50 — Portfolio
 
@@ -163,7 +185,9 @@ Mention creator fees:
 
 | Symptom | Say this, then do this |
 | --- | --- |
-| Market has closed | "Markets close — that's the live catalog." Switch to backup market #2 |
+| Market left the primary phase | "Markets move — that's a live catalog." Switch to a backup |
+| A card shows a market id instead of a question | "Panta's list endpoint returns no title for some markets. We merge detail where we can, and never invent one" |
+| An error says "try again" | "Panta's API intermittently rejects valid requests. We classify that as transient and retry reads automatically" |
 | Quote returns `MARKET_NOT_IN_PRIMARY` | "This one left the primary phase." Switch markets |
 | `QUOTE_STALE` | "The curve moved past our slippage tolerance — Panta caught it." Re-quote |
 | Wallet prompt is slow | Keep talking about the status line; it is showing the real stage |
@@ -180,5 +204,5 @@ than a demo that only works on rails.
 
 - Every Panta-powered surface shows **"Powered by Panta"**, per Panta's Terms §6.
 - The whole thing is responsive: on mobile the trade ticket is a proper bottom sheet.
-- 115 unit tests, clean lint, clean typecheck, clean production build.
+- 133 unit tests, clean lint, clean typecheck, clean production build.
 - No database, no login, no custody — the connected wallet *is* the identity.
