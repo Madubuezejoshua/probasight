@@ -17,6 +17,7 @@ export type AppErrorShape = {
 /** Documented Panta codes plus our own transport/app codes. */
 export const RETRYABLE_CODES = new Set([
   "RATE_LIMITED",
+  "UPSTREAM_TRANSIENT",
   "INTERNAL_ERROR",
   "UPSTREAM_UNREACHABLE",
   "UPSTREAM_TIMEOUT",
@@ -91,6 +92,8 @@ const MESSAGES: Record<string, string> = {
     "The transaction does not match the expected wallet, market or program for this action.",
   TX_FEE_MISMATCH: "The on-chain amount does not match the quoted amount.",
   RATE_LIMITED: "Panta rate limit reached. Wait a moment and try again.",
+  UPSTREAM_TRANSIENT:
+    "Panta rejected that request without saying why, which it does intermittently under load. Nothing is wrong with your input — try again.",
   INTERNAL_ERROR: "Panta returned an internal error.",
   // Our own codes
   PANTA_NOT_CONFIGURED:
@@ -150,12 +153,32 @@ export function normalizePantaError(status: number, body: unknown): AppError {
   if (parsed.fields && typeof parsed.fields === "object") details.fields = parsed.fields;
   if (upstreamMessage) details.upstreamMessage = upstreamMessage;
 
+  /**
+   * A bare INVALID_MARKET_PARAMS is an upstream fault, not a validation error.
+   *
+   * Verified against production: the identical request alternates between 200
+   * and `400 {"code":"INVALID_MARKET_PARAMS"}` with no `field`, no `fields`
+   * and no `message`. Every genuine Panta validation failure carries detail —
+   * `{"message":"limit must be an integer","field":"limit"}` or
+   * `{"fields":{"imageUrl":[...]}}`. Treating the detail-less form as a hard
+   * user error told people their input was rejected when nothing was wrong
+   * with it, and denied them a retry. It is surfaced as transient instead.
+   */
+  const isDetaillessParamsError =
+    code === "INVALID_MARKET_PARAMS" && Object.keys(details).length === 0;
+
   return new AppError({
-    code,
-    message: messageForCode(code, upstreamMessage),
+    code: isDetaillessParamsError ? "UPSTREAM_TRANSIENT" : code,
+    message: isDetaillessParamsError
+      ? messageForCode("UPSTREAM_TRANSIENT")
+      : messageForCode(code, upstreamMessage),
     details: Object.keys(details).length ? details : undefined,
-    status,
-    retryable: RETRYABLE_CODES.has(code) || status === 429 || status >= 500,
+    status: isDetaillessParamsError ? 502 : status,
+    retryable:
+      isDetaillessParamsError ||
+      RETRYABLE_CODES.has(code) ||
+      status === 429 ||
+      status >= 500,
   });
 }
 

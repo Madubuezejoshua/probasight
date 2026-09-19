@@ -38,7 +38,15 @@ describe("normalizePantaError", () => {
     expect(normalizePantaError(404, {}).code).toBe("MARKET_NOT_FOUND");
     expect(normalizePantaError(429, {}).code).toBe("RATE_LIMITED");
     expect(normalizePantaError(500, {}).code).toBe("INTERNAL_ERROR");
-    expect(normalizePantaError(400, {}).code).toBe("INVALID_MARKET_PARAMS");
+  });
+
+  it("treats a wholly empty 400 as transient, not as a user input error", () => {
+    // A 400 with no code and no detail carries no evidence that the caller did
+    // anything wrong, and matches the shape of the upstream flakiness below.
+    // Blaming the user's input for it would be a guess.
+    const error = normalizePantaError(400, {});
+    expect(error.code).toBe("UPSTREAM_TRANSIENT");
+    expect(error.retryable).toBe(true);
   });
 
   it("marks transient failures retryable and permanent ones not", () => {
@@ -127,5 +135,61 @@ describe("toAppError", () => {
       details: undefined,
       retryable: true,
     });
+  });
+});
+
+/**
+ * Panta intermittently returns a BARE `INVALID_MARKET_PARAMS` for requests that
+ * succeed moments later. Reproduced against production: the identical
+ * trade-status request alternated 200 / 400 across eight consecutive calls,
+ * with the 400 body being exactly `{"code":"INVALID_MARKET_PARAMS"}`.
+ *
+ * Genuine validation failures always carry `field`, `fields` or `message`. The
+ * distinction is what separates "your input is wrong" (do not retry) from
+ * "upstream hiccuped" (retry).
+ */
+describe("detail-less INVALID_MARKET_PARAMS is treated as transient", () => {
+  it("reclassifies a bare params error as retryable upstream noise", () => {
+    const error = normalizePantaError(400, { code: "INVALID_MARKET_PARAMS" });
+    expect(error.code).toBe("UPSTREAM_TRANSIENT");
+    expect(error.retryable).toBe(true);
+    expect(error.status).toBe(502);
+    expect(error.message).toMatch(/nothing is wrong with your input/i);
+  });
+
+  it("keeps a params error with a field as a hard validation failure", () => {
+    const error = normalizePantaError(400, {
+      code: "INVALID_MARKET_PARAMS",
+      message: "limit must be an integer",
+      field: "limit",
+    });
+    expect(error.code).toBe("INVALID_MARKET_PARAMS");
+    expect(error.retryable).toBe(false);
+    expect(error.status).toBe(400);
+    expect(error.details?.field).toBe("limit");
+  });
+
+  it("keeps a params error with fields as a hard validation failure", () => {
+    const error = normalizePantaError(400, {
+      code: "INVALID_MARKET_PARAMS",
+      fields: { imageUrl: ["This field is required."] },
+    });
+    expect(error.code).toBe("INVALID_MARKET_PARAMS");
+    expect(error.retryable).toBe(false);
+    expect(error.details?.fields).toEqual({ imageUrl: ["This field is required."] });
+  });
+
+  it("keeps a params error with only a message as a hard validation failure", () => {
+    const error = normalizePantaError(400, {
+      code: "INVALID_MARKET_PARAMS",
+      message: "startTime must be at least 3600s ahead of now",
+    });
+    expect(error.code).toBe("INVALID_MARKET_PARAMS");
+    expect(error.retryable).toBe(false);
+  });
+
+  it("does not reclassify other bare codes", () => {
+    expect(normalizePantaError(400, { code: "NOT_CLAIMABLE" }).code).toBe("NOT_CLAIMABLE");
+    expect(normalizePantaError(400, { code: "MARKET_NOT_IN_PRIMARY" }).retryable).toBe(false);
   });
 });

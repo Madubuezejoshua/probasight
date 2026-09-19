@@ -69,7 +69,7 @@ function logUpstream(info: {
   console.log(parts.join(" "));
 }
 
-export async function pantaRequest<T>(req: PantaRequest): Promise<PantaResponse<T>> {
+async function pantaRequestOnce<T>(req: PantaRequest): Promise<PantaResponse<T>> {
   const { apiKey, baseUrl } = getPantaConfig();
   if (!apiKey) {
     throw new AppError({
@@ -176,4 +176,49 @@ export async function pantaRequest<T>(req: PantaRequest): Promise<PantaResponse<
 
   logUpstream({ method, path: req.path, status: res.status, ms: Date.now() - started });
   return { data: parsed as T, status: res.status, rateLimit };
+}
+
+/**
+ * Bounded automatic retry for idempotent reads.
+ *
+ * Panta's production API intermittently answers a perfectly valid request with
+ * a bare `400 {"code":"INVALID_MARKET_PARAMS"}` and then succeeds on the next
+ * identical call. Measured during the audit: the same trade-status request
+ * alternated 200/400 across eight consecutive calls, and `claim/build`
+ * alternated between the bare code and the real `NOT_CLAIMABLE`. Left alone
+ * that turns roughly half of all page loads into an error state.
+ *
+ * `normalizePantaError` already reclassifies the detail-less form as
+ * `UPSTREAM_TRANSIENT`. This retries it, but ONLY for GET:
+ *
+ *  - GET is idempotent, so a repeat is free and cannot double-spend.
+ *  - POST is never retried here. Quote and build would mint duplicate
+ *    sessions, and submit/report/register must never fire twice against the
+ *    same signature. Those surface as retryable so a person decides.
+ *
+ * Genuine errors are untouched: a params error carrying `field`/`fields` keeps
+ * its code and is not retried.
+ */
+const TRANSIENT_RETRY_CODES = new Set(["UPSTREAM_TRANSIENT", "UPSTREAM_UNREACHABLE"]);
+const MAX_READ_ATTEMPTS = 3;
+const RETRY_BACKOFF_MS = [150, 400];
+
+export async function pantaRequest<T>(req: PantaRequest): Promise<PantaResponse<T>> {
+  const method = req.method ?? "GET";
+  if (method !== "GET") return pantaRequestOnce<T>(req);
+
+  let lastError: unknown;
+  for (let attempt = 0; attempt < MAX_READ_ATTEMPTS; attempt += 1) {
+    try {
+      return await pantaRequestOnce<T>(req);
+    } catch (err) {
+      lastError = err;
+      const code = err instanceof AppError ? err.code : "";
+      if (!TRANSIENT_RETRY_CODES.has(code) || attempt === MAX_READ_ATTEMPTS - 1) throw err;
+      const delay = RETRY_BACKOFF_MS[attempt] ?? 400;
+      console.log(`panta retry ${attempt + 1}/${MAX_READ_ATTEMPTS - 1} ${req.path} after ${code}`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError;
 }
