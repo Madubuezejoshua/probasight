@@ -7,13 +7,16 @@ import { unixToDate, type PantaTimestamp } from "@/lib/utils/time";
 /**
  * Whether this market states what it is actually about.
  *
- * Some live catalog rows carry an empty `title` AND an empty `description`. A
- * model handed such a row will confabulate a question from whatever is left —
- * observed in testing, where a nameless `sports` market with world-politics
- * oracle feeds produced an invented "Marco Rubio 2028 nomination" question.
+ * Note the two different shapes Panta returns: `GET /markets/` (list) sends
+ * `title: ""` for most rows, while `GET /markets/{id}/` (detail) usually has
+ * the real question. This check runs against detail, so it only refuses the
+ * markets that are genuinely empty in both — still a meaningful share of the
+ * live catalog.
  *
- * Analysis is refused outright in that case. There is nothing truthful to say
- * about a market whose question is unknown.
+ * Refusing matters because a model handed a market with no question is free to
+ * infer one from the category, region or oracle feed names, and would present
+ * that inference as the market's subject. There is nothing truthful to say
+ * about a market whose question is unknown, so nothing is said.
  */
 export function hasAnalysableQuestion(market: PantaMarket): boolean {
   return Boolean(market.title?.trim() || market.description?.trim());
