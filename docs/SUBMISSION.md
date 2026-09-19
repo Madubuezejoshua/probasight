@@ -179,7 +179,7 @@ quote → build → sign → broadcast → confirm → report → verify lifecyc
 transaction shapes (instruction list and assembled base64 transaction) handled correctly;
 distinct error states for 20+ failure modes; quote/session/blockhash expiry handled by
 rebuilding; the creator-fee attribution exception implemented; fully typed; clean lint,
-clean typecheck, 81 passing unit tests, clean production build.
+clean typecheck, 115 passing unit tests, clean production build.
 
 ### 3. Product & User Experience
 

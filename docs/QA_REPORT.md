@@ -199,6 +199,7 @@ bytes. Not a leak.
 | 2 | Mobile navigation sheet anchored at `top-14` while the header grows to `h-16` from `sm` up, leaving an 8px gap in the 640–767px range | Same audit | Added `sm:top-16` to the sheet | Low — visual seam |
 | 3 | Six redundant `eslint-disable` directives for rules not enabled in this config, reported as warnings | `npx eslint .` | Removed via `--fix`, then stripped the resulting trailing whitespace repo-wide | Low — lint noise |
 | 4 | Four dead exports shipped in the source tree: `getConnection`, `categoryLabel`/`CATEGORY_LABELS`, `isValidPublicKey`, and a `handler` route wrapper no route used | Dead-export audit | Deleted the unused modules and helpers. `REBUILD_CODES` was *not* deleted — it was wired into `useTradeFlow` and `useCreateFlow`, replacing hand-written code comparisons, so expired-session handling now has one source of truth. The 5xx logging that lived in the unused `handler` was moved into `errorResponse`, which every route does use, so it is now actually reached | Low — no runtime effect, but dead code in a reviewed submission is a real cost |
+| 13 | **A missing market returned HTTP 200 with 404 content.** `/markets/<bad-id>` rendered the correct "not found" page but with a 200 status, which misleads crawlers and uptime monitoring | Status-code sweep across page routes | Root-caused to the app-root `loading.tsx`: it creates a Suspense boundary above every route, so Next streams a 200 shell before `notFound()` can run. Verified by removing it (404 restored) and by proving a `markets/loading.tsx` re-broke it through cascade. Fixed with **route groups** — the homepage moved to `(home)/` and the markets list to `markets/(list)/`, each with its own loading boundary, so no boundary sits above `markets/[marketId]`. Loading skeletons are fully preserved and all three 404 cases now return 404 | Medium |
 | 9 | **The AI invented an entire market question.** A live market with an empty title, empty description, category `sports` and world-politics oracle feeds produced the summary *"The market asks whether Marco Rubio will win the 2028 Republican presidential nomination."* Nothing in the data referenced Rubio, 2028 or a nomination — the model confabulated it from the oracle feed names. This is a direct violation of the product's core guarantee | Live AI testing across multiple real markets | Three layers: (a) `hasAnalysableQuestion` hard-guards the route, returning `MARKET_QUESTION_UNAVAILABLE` (422) when both title and description are empty; (b) the context builder now passes the **raw** title rather than the synthesised display name, which was itself reading to the model as a real title; (c) the system prompt gained rule 2b forbidding any inference of the subject from category, region, oracle feed names, market id or timing, and stating explicitly that oracle identifiers name a data source, not the question. The UI hides the Analyze button entirely and explains why. 6 regression tests | **CRITICAL** — fabricated market analysis is the worst possible failure for this product |
 | 10 | **Phase filter returned wrong results.** Panta's documented `status` parameter does not filter by phase against the live catalog: `status=primary` returned 9 cancelled + 36 resolved + 3 primary rows, and `status=resolved` returned 0 while 38 resolved markets existed. The UI's phase chips were therefore actively misleading | Live catalog testing per phase | Stopped sending `status` upstream. Phase is now filtered client-side on each row's real `phase` field, and the homepage does the same for its featured rail. `category`, which was verified to filter correctly, is still sent upstream | **High** — users saw "no markets" where 38 existed |
 | 11 | **"Load more" was a dead button.** Panta's cursor does not advance: passing the returned `nextCursor` yields the identical page with the identical cursor, indefinitely. Client-side dedup meant clicking Load More appended nothing, forever | Pagination walk (12 pages, 50 unique markets total) | Load-more now detects a page that yields zero new rows, retires the button and shows "End of the Panta catalog for this filter" | Medium — a visibly dead control |
@@ -208,7 +209,7 @@ bytes. Not a leak.
 | 7 | **Default Groq model was decommissioned.** `llama-3.3-70b-versatile` returns 404 `model_not_found`; the AI panel failed entirely | Live Groq call with a real key | Queried Groq's live model list and switched the default to `openai/gpt-oss-120b`, verified to support JSON mode. Deliberately avoided `groq/compound*`, which has **built-in web search** and would break the guarantee that analysis is grounded only in the Panta snapshot | **High** — the originality feature was completely broken |
 | 5 | Two orphaned API routes. `/api/panta/trades/{signature}` (attribution status) and `/api/panta/categories` were built and working, but nothing in the product called them. The first left the **Panta attribution loop open** — a trade reporting as `pending_attribution` had no way to be re-checked. The second meant a failed server-side category fetch left the filter row permanently empty with no recovery path | Route-reachability scan: every route grepped against product code | Built `AttributionStatus` — a bounded, decelerating poll (2s/6s/15s/30s) that stops as soon as the status settles, then hands the user a manual re-check. Wired into both the trade success panel and the win-claim success state. Added a client-side category retry to `MarketsExplorer`. All 20 routes are now reachable from the product | **Medium** — attribution is a judged criterion and the loop was not closable |
 
-All twelve were fixed and the full gate (lint, typecheck, tests, build) re-run clean
+All thirteen were fixed and the full gate (lint, typecheck, tests, build) re-run clean
 afterwards.
 
 ---
@@ -297,22 +298,16 @@ None of these required a database, a scraper, or fabricated data to work around.
 
 ## 8. Known non-blocking issues
 
-1. **A missing market returns HTTP 200 with 404 content.** `/markets/<bad-id>` renders the
-   correct "Market not found" page, but Next.js 15.5.4 commits a 200 status before
-   `notFound()` throws on a dynamically-rendered segment. Adding a segment-level
-   `not-found.tsx` and switching from `force-dynamic` to `revalidate` were both tried and
-   neither changed the status. The user-visible behaviour is correct; only the status code
-   is wrong, which matters for crawlers and uptime monitoring rather than for people.
-2. **AI rate limiter is in-process.** Per-instance on serverless rather than a global quota.
+1. **AI rate limiter is in-process.** Per-instance on serverless rather than a global quota.
    Adequate for abuse-resistance at this scale; a shared store would need a dependency the
    spec rules out.
-3. **Position valuation fans out** to one market-detail call per distinct market, capped at
+2. **Position valuation fans out** to one market-detail call per distinct market, capped at
    24 per request. Beyond that the response sets `truncatedMarketLookups` and the UI says so.
-4. **Created Markets is account-scoped** where Panta does not expose `creatorAddress`. The UI
+3. **Created Markets is account-scoped** where Panta does not expose `creatorAddress`. The UI
    discloses this; Panta enforces ownership on the claim itself.
-5. **Default Groq model** (`llama-3.3-70b-versatile`) could not be confirmed as currently
-   served without a valid key. `GROQ_MODEL` overrides it.
-6. **Public Solana RPC default** is heavily rate-limited. A dedicated RPC is strongly
+4. **Groq model ids change.** The default `openai/gpt-oss-120b` was verified against
+   Groq's live model list; `GROQ_MODEL` overrides it if that changes.
+5. **Public Solana RPC default** is heavily rate-limited. A dedicated RPC is strongly
    recommended before any real trading.
 
 ---

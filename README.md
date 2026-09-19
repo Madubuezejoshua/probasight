@@ -37,7 +37,7 @@ A single Next.js application with five pages and a server-side Panta integration
 | Surface | Purpose |
 | --- | --- |
 | `/` | Compact hero, live trending Panta markets, intelligence showcase, how-it-works |
-| `/markets` | Discovery: category + phase filters, readable YES/NO pricing, load-more |
+| `/markets` | Discovery: category filter (server-side), phase + text filters (client-side), readable YES/NO pricing |
 | `/markets/[marketId]` | Showpiece: market header, activity chart, AI intelligence, trade ticket, tape |
 | `/portfolio` | Positions, claimable winnings, wallet activity, created markets + creator fees |
 | `/create` | Market creation: form, live preview, Panta fee quote, sign, register |
@@ -90,7 +90,9 @@ src/
     create/page.tsx              market creation
     api/panta/*                  Panta proxy routes (server-only key)
     api/ai/market-analysis       Groq analysis route
-    layout.tsx, globals.css, loading.tsx, error.tsx, not-found.tsx
+    layout.tsx, globals.css, error.tsx, not-found.tsx
+    (home)/          route group: homepage + its own loading boundary
+    markets/(list)/  route group: list page + its own loading boundary
   components/
     layout/  wallet/  markets/  trading/  portfolio/  creation/  ai/  common/
   lib/
@@ -140,7 +142,7 @@ cp .env.example .env.local
 | `PANTA_API_KEY` | **Yes** | Server | Authenticates every Panta call |
 | `PANTA_API_BASE_URL` | No | Server | Defaults to `https://live-api.panta.market/api/v1` |
 | `GROQ_API_KEY` | No | Server | AI Market Intelligence only |
-| `GROQ_MODEL` | No | Server | Defaults to `llama-3.3-70b-versatile` |
+| `GROQ_MODEL` | No | Server | Defaults to `openai/gpt-oss-120b`. Never set a `groq/compound*` model — those have built-in web search |
 | `NEXT_PUBLIC_SOLANA_RPC_URL` | Recommended | Public | Broadcasting and confirming transactions |
 | `NEXT_PUBLIC_SOLANA_NETWORK` | No | Public | Explorer links; defaults to `mainnet-beta` |
 

@@ -180,5 +180,5 @@ than a demo that only works on rails.
 
 - Every Panta-powered surface shows **"Powered by Panta"**, per Panta's Terms §6.
 - The whole thing is responsive: on mobile the trade ticket is a proper bottom sheet.
-- 81 unit tests, clean lint, clean typecheck, clean production build.
+- 115 unit tests, clean lint, clean typecheck, clean production build.
 - No database, no login, no custody — the connected wallet *is* the identity.
