@@ -1,4 +1,5 @@
 import { MarketGridSkeleton, Skeleton } from "@/components/common/States";
+import { HeroIntelligenceCardSkeleton } from "@/components/home/HeroIntelligenceCard";
 
 /**
  * Loading boundary scoped to the homepage only.
@@ -12,14 +13,23 @@ import { MarketGridSkeleton, Skeleton } from "@/components/common/States";
 export default function HomeLoading() {
   return (
     <div className="mx-auto max-w-[1440px] px-4 sm:px-6">
+      {/* Mirrors the hero's 55/45 split so the layout does not shift when the
+          real content streams in. */}
       <section className="border-b border-[var(--color-border-subtle)] py-10 sm:py-14">
-        <Skeleton className="h-6 w-64 rounded-full" />
-        <Skeleton className="mt-4 h-12 w-80 max-w-full" />
-        <Skeleton className="mt-3 h-12 w-64 max-w-full" />
-        <Skeleton className="mt-5 h-5 w-96 max-w-full" />
-        <div className="mt-7 flex gap-3">
-          <Skeleton className="h-10 w-36" />
-          <Skeleton className="h-10 w-36" />
+        <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[55fr_45fr] lg:gap-10">
+          <div>
+            <Skeleton className="h-6 w-64 rounded-full" />
+            <Skeleton className="mt-4 h-12 w-80 max-w-full" />
+            <Skeleton className="mt-3 h-12 w-64 max-w-full" />
+            <Skeleton className="mt-5 h-5 w-96 max-w-full" />
+            <div className="mt-7 flex gap-3">
+              <Skeleton className="h-10 w-36" />
+              <Skeleton className="h-10 w-36" />
+            </div>
+          </div>
+          <div className="w-full lg:max-w-[520px] lg:justify-self-end">
+            <HeroIntelligenceCardSkeleton />
+          </div>
         </div>
       </section>
       <section className="py-8 sm:py-10">

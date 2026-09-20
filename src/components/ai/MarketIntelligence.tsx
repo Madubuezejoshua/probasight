@@ -5,33 +5,15 @@ import { apiFetch, toErrorShape, type ApiErrorShape } from "@/lib/client-api";
 import type { MarketAnalysisResponse } from "@/lib/ai/schema";
 import { ErrorState, Skeleton, Spinner } from "@/components/common/States";
 import { PoweredByPanta } from "@/components/common/PoweredByPanta";
+import { readAnalysisCache, writeAnalysisCache } from "@/lib/ai/analysis-cache";
 
 /**
  * AI Market Intelligence.
  *
  * Runs only on an explicit user action, never on render. The result is cached
- * in sessionStorage per market so navigating back does not re-bill the model;
- * there is no database and nothing is persisted server-side.
+ * per market by `lib/ai/analysis-cache` so navigating back does not re-bill the
+ * model; there is no database and nothing is persisted server-side.
  */
-
-const CACHE_PREFIX = "pp:analysis:";
-
-function readCache(marketId: string): MarketAnalysisResponse | null {
-  try {
-    const raw = sessionStorage.getItem(CACHE_PREFIX + marketId);
-    return raw ? (JSON.parse(raw) as MarketAnalysisResponse) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeCache(marketId: string, value: MarketAnalysisResponse) {
-  try {
-    sessionStorage.setItem(CACHE_PREFIX + marketId, JSON.stringify(value));
-  } catch {
-    // Storage can be unavailable or full; the analysis still renders.
-  }
-}
 
 export function MarketIntelligence({
   marketId,
@@ -46,7 +28,7 @@ export function MarketIntelligence({
   const [error, setError] = useState<ApiErrorShape | null>(null);
 
   useEffect(() => {
-    setData(readCache(marketId));
+    setData(readAnalysisCache(marketId));
     setError(null);
   }, [marketId]);
 
@@ -59,7 +41,7 @@ export function MarketIntelligence({
         body: { marketId },
       });
       setData(result);
-      writeCache(marketId, result);
+      writeAnalysisCache(marketId, result);
     } catch (err) {
       setError(toErrorShape(err));
     } finally {
