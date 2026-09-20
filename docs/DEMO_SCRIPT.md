@@ -1,8 +1,8 @@
-# Demo script: Panta Pulse
+# Demo script: ProbaSight
 
 Written for: whoever is presenting this to the Colosseum / Panta Sidetrack judges.
 
-**Target length: 2–4 minutes.** Practise once end-to-end before recording.
+**Target length: 2-4 minutes.** Practise once end-to-end before recording.
 
 ---
 
@@ -19,7 +19,7 @@ keep the backups open in other tabs.
 | **BACKUP 2** | *Will Cisco Systems (CSCO) report cumulative FY2026 AI infrastructure orders…* | `vQZWPdVNZPdDKnXQG822J4zKWbHthUq1ydeazaq475X` |
 
 > **Catalog caveat, worth knowing before a judge asks.** Most live Panta markets currently
-> return no question text on the list endpoint. Panta Pulse merges market detail into the
+> return no question text on the list endpoint. ProbaSight merges market detail into the
 > leading cards so real questions appear, but some rows are genuinely nameless upstream and
 > show their market id instead. Say exactly that if asked, it is upstream data, and
 > inventing a title would be fabrication.
@@ -41,19 +41,19 @@ keep the backups open in other tabs.
 
 ## The run
 
-### 0:00–0:20: What this is
+### 0:00-0:20: What this is
 
 Open `/`.
 
-> "Panta Pulse turns Panta prediction markets into an AI intelligence and trading terminal.
+> "ProbaSight turns Panta prediction markets into an AI intelligence and trading terminal.
 > Panta provides the market infrastructure, the catalog, the pricing, the settlement.
-> Panta Pulse provides the research layer and the user experience on top of it."
+> ProbaSight provides the research layer and the user experience on top of it."
 
 Point at the trending cards.
 
 > "Every market here is live from the Panta catalog, with real YES/NO pricing."
 
-### 0:20–0:40: Discovery
+### 0:20-0:40: Discovery
 
 Click **Explore Markets**.
 
@@ -66,7 +66,7 @@ Click a category chip. Click **Primary**.
 > rows for a primary query. We'd rather be correct than pretend. Same with search: Panta's
 > catalog has no text-search parameter, so the box filters what's loaded and says so."
 
-### 0:40–1:00: Market detail
+### 0:40-1:00: Market detail
 
 Open your chosen market.
 
@@ -82,7 +82,7 @@ Scroll to the chart.
 
 *(That line lands well with technical judges. Keep it.)*
 
-### 1:00–1:45: AI Market Intelligence ← **the originality moment**
+### 1:00-1:45: AI Market Intelligence ← **the originality moment**
 
 Click **Regenerate** on the AI panel (or **Analyze with AI** if cold).
 
@@ -102,7 +102,7 @@ Then point specifically at **Data limitations**:
 > required to name exactly what it can't see rather than filling the gap. It never tells you
 > what to trade."
 
-### 1:45–2:30: Trading
+### 1:45-2:30: Trading
 
 Scroll to the trade panel (or tap the sticky bar on mobile).
 
@@ -126,7 +126,7 @@ When it completes:
 > first-class step rather than a side effect. Panta also embeds an attribution memo in the
 > transaction itself."
 
-### 2:30–2:50: Portfolio
+### 2:30-2:50: Portfolio
 
 Click **View position**.
 
@@ -146,7 +146,7 @@ Open the **Claimable** tab.
 *(If you have a genuinely claimable position, claim it here. If not, say exactly that,
 do not stage one.)*
 
-### 2:50–3:20: Creator loop
+### 2:50-3:20: Creator loop
 
 Open `/create`.
 
@@ -167,9 +167,9 @@ Mention creator fees:
 > "Created markets show up in the portfolio with a creator-fee claim. That one deliberately
 > skips the trade-report step, because Panta rejects creator-fee signatures for attribution."
 
-### 3:20–3:40: Close on architecture
+### 3:20-3:40: Close on architecture
 
-> "So: Panta provides the market infrastructure. Panta Pulse provides the intelligence and
+> "So: Panta provides the market infrastructure. ProbaSight provides the intelligence and
 > the user experience on top of it.
 >
 > The developer key never reaches the browser, every Panta call is proxied server-side.

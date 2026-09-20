@@ -124,7 +124,7 @@ decisions:
 | Situation | What we do |
 | --- | --- |
 | List rows have `yesPrice: null` | Enrich the first 12 rows via market detail; beyond that show "Live price available on the market page" |
-| A price is outside 0–1 | `priceToImpliedPercent` returns `null`; no percentage is shown |
+| A price is outside 0-1 | `priceToImpliedPercent` returns `null`; no percentage is shown |
 | Trade rows have no USDC amount | No price chart. Chart cumulative share flow instead, and label it |
 | Fewer than 2 timestamped trades | No chart at all, with an explanation |
 | No entry price in positions | No P&L, anywhere |

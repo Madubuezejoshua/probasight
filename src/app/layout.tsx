@@ -10,12 +10,12 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: {
-    default: "Panta Pulse: Prediction markets, understood",
-    template: "%s · Panta Pulse",
+    default: "ProbaSight: Prediction markets, understood",
+    template: "%s · ProbaSight",
   },
   description:
     "An AI-powered prediction-market intelligence and trading terminal built on Panta. Discover markets, read structured AI analysis, and trade YES/NO on Solana with your own wallet.",
-  applicationName: "Panta Pulse",
+  applicationName: "ProbaSight",
   keywords: [
     "prediction markets",
     "Panta",
@@ -24,13 +24,15 @@ export const metadata: Metadata = {
     "forecasting",
   ],
   openGraph: {
-    title: "Panta Pulse: Prediction markets, understood",
+    title: "ProbaSight: Prediction markets, understood",
     description:
       "Real-time Panta market intelligence, AI analysis, and on-chain trading in one terminal.",
+    siteName: "ProbaSight",
     type: "website",
   },
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
 };
 

@@ -1,4 +1,4 @@
-# Panta Pulse: Submission Readiness
+# ProbaSight: Submission Readiness
 
 Short version of `REPORT.md`. Every line here is backed by something executed during the
 final audit; anything not executed says **BLOCKED**, never PASS.

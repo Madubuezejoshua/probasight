@@ -16,7 +16,7 @@ already exist or Panta's own attribution data.
 
 This is the number the Panta Sidetrack cares about most, and it is the one you can prove.
 
-Because Panta Pulse reports every primary buy and win claim to `POST /trades/`, all volume
+Because ProbaSight reports every primary buy and win claim to `POST /trades/`, all volume
 routed through it is attributed to your API key's account.
 
 **How to read it:**
@@ -33,7 +33,7 @@ Record from the response:
 | Total attributed trades | `summary.trades.total` |
 | Attributed volume (USDC base units) | `summary.trades.volumeUsdcBase`, divide by 1,000,000 |
 | Breakdown by kind (buy vs claim) | `summary.trades.byKind` |
-| Markets created via Panta Pulse | `summary.creates.total` |
+| Markets created via ProbaSight | `summary.creates.total` |
 
 Also available: `GET /account/dashboard/` for the same counters in aggregate form.
 
@@ -115,7 +115,7 @@ From `GET /account/metrics/` → `summary.creates.total`, and cross-checkable in
 
 ## 7. Tester feedback
 
-Collect 3–5 short verbatim quotes. Get permission to attribute, or anonymise as
+Collect 3-5 short verbatim quotes. Get permission to attribute, or anonymise as
 "a tester" / "a first-time prediction-market user".
 
 | # | Quote | Attribution | Consent given |
@@ -136,7 +136,7 @@ If you have a few hours:
 1. Deploy and enable hosting analytics. *(15 min)*
 2. Complete one real trade yourself, end to end, and capture the signature. *(10 min)*
 3. Create one real market and capture the market id. *(15 min)*
-4. Get 5–10 people to run the core loop on a funded wallet. *(1–2 hours)*
+4. Get 5-10 people to run the core loop on a funded wallet. *(1-2 hours)*
 5. Pull `GET /account/metrics/` and record every figure with a timestamp. *(5 min)*
 6. Collect written feedback from each tester. *(30 min)*
 7. Fill in `SUBMISSION.md` with the real numbers and delete every placeholder.

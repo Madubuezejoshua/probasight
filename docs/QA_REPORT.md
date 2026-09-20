@@ -195,8 +195,8 @@ bytes. Not a leak.
 
 | # | Bug | How found | Fix | Severity |
 | --- | --- | --- | --- | --- |
-| 1 | Sticky mobile trade bar visible until `lg` (1024px), but the page's extra bottom padding stopped at `sm` (640px), content could sit underneath the bar at tablet widths (640–1023px) | Responsive audit of breakpoint pairing | Changed `sm:pb-10` → `lg:pb-10` on the market detail container so padding persists exactly as long as the bar does | Medium, would have clipped the trade tape on tablets |
-| 2 | Mobile navigation sheet anchored at `top-14` while the header grows to `h-16` from `sm` up, leaving an 8px gap in the 640–767px range | Same audit | Added `sm:top-16` to the sheet | Low, visual seam |
+| 1 | Sticky mobile trade bar visible until `lg` (1024px), but the page's extra bottom padding stopped at `sm` (640px), content could sit underneath the bar at tablet widths (640-1023px) | Responsive audit of breakpoint pairing | Changed `sm:pb-10` → `lg:pb-10` on the market detail container so padding persists exactly as long as the bar does | Medium, would have clipped the trade tape on tablets |
+| 2 | Mobile navigation sheet anchored at `top-14` while the header grows to `h-16` from `sm` up, leaving an 8px gap in the 640-767px range | Same audit | Added `sm:top-16` to the sheet | Low, visual seam |
 | 3 | Six redundant `eslint-disable` directives for rules not enabled in this config, reported as warnings | `npx eslint .` | Removed via `--fix`, then stripped the resulting trailing whitespace repo-wide | Low, lint noise |
 | 4 | Four dead exports shipped in the source tree: `getConnection`, `categoryLabel`/`CATEGORY_LABELS`, `isValidPublicKey`, and a `handler` route wrapper no route used | Dead-export audit | Deleted the unused modules and helpers. `REBUILD_CODES` was *not* deleted, it was wired into `useTradeFlow` and `useCreateFlow`, replacing hand-written code comparisons, so expired-session handling now has one source of truth. The 5xx logging that lived in the unused `handler` was moved into `errorResponse`, which every route does use, so it is now actually reached | Low, no runtime effect, but dead code in a reviewed submission is a real cost |
 | 13 | **A missing market returned HTTP 200 with 404 content.** `/markets/<bad-id>` rendered the correct "not found" page but with a 200 status, which misleads crawlers and uptime monitoring | Status-code sweep across page routes | Root-caused to the app-root `loading.tsx`: it creates a Suspense boundary above every route, so Next streams a 200 shell before `notFound()` can run. Verified by removing it (404 restored) and by proving a `markets/loading.tsx` re-broke it through cascade. Fixed with **route groups**: the homepage moved to `(home)/` and the markets list to `markets/(list)/`, each with its own loading boundary, so no boundary sits above `markets/[marketId]`. Loading skeletons are fully preserved and all three 404 cases now return 404 | Medium |
@@ -260,7 +260,7 @@ prompt. None of it can be honestly claimed as tested.
 
 | Area | Blocked by | Where it is covered |
 | --- | --- | --- |
-| Live market data rendering | `PANTA_API_KEY` | E2E steps 1–2 |
+| Live market data rendering | `PANTA_API_KEY` | E2E steps 1-2 |
 | AI analysis output quality | `GROQ_API_KEY` | E2E step 3 |
 | Groq model id currently served | `GROQ_API_KEY` | Overridable via `GROQ_MODEL` |
 | Wallet connect / disconnect | Browser wallet extension | E2E step 4 |

@@ -1,4 +1,4 @@
-# Panta Pulse: Final Readiness Report
+# ProbaSight: Final Readiness Report
 
 Written for: the project owner, and any Colosseum / Panta Sidetrack judge opening this
 repository.
@@ -12,14 +12,16 @@ Audit environment: Windows 11, Node 24.20.0, npm 11.19.0, Next.js 15.5.25.
 Credentials in use: live Panta key (production catalog), Groq key, Helius mainnet RPC.
 No credential value appears in this document.
 
-*(Naming note: this project is **Panta Pulse**, built on the **Panta** API. If you were
-looking for "Panther", this is the same project, there is no second project.)*
+*(Naming note: this project is **ProbaSight**, built on the **Panta** API. It was
+previously named "Panta Pulse"; that was a rename of this same project, not a different
+one. If you were looking for "Panther", also the same project. There is exactly one
+project here. See `docs/REBRAND_REPORT.md`.)*
 
 ---
 
 ## Executive Summary
 
-Panta Pulse is a working, non-custodial prediction-market intelligence and trading terminal
+ProbaSight is a working, non-custodial prediction-market intelligence and trading terminal
 built on the Panta public API. All 18 Panta endpoints this integration needs are wired to
 real product surfaces and were verified against the live production API during this audit.
 
@@ -223,7 +225,7 @@ is merged into the leading cards so real questions appear; genuinely nameless ma
 their id rather than an invented title.
 
 **Cold-load note:** `/markets` took 10.6 s on the first request after a cold start (12 detail
-enrichments), then 0.07–0.23 s warm. The route-group `loading.tsx` streams a skeleton
+enrichments), then 0.07-0.23 s warm. The route-group `loading.tsx` streams a skeleton
 immediately, so perceived load stays fast.
 
 ---
@@ -265,7 +267,7 @@ entertainment**, all rendered by the same components. Categories come from
 
 **READY to collect. Nothing invented.**
 
-Attribution is correctly wired, so trades routed through Panta Pulse are attributable to this
+Attribution is correctly wired, so trades routed through ProbaSight are attributable to this
 API account and readable from `GET /account/metrics/`. Panta also embeds its own attribution
 memo on-chain. No analytics backend was built. Collection plan in
 `docs/TRACTION_CHECKLIST.md`; every figure in `docs/SUBMISSION.md` is a blank placeholder.
@@ -281,7 +283,7 @@ loop, and verbatim tester feedback.
 | Route | HTTP | Size | Time | Result |
 | --- | --- | --- | --- | --- |
 | `/` | 200 | 108 KB | 0.094 s | PASS |
-| `/markets` | 200 | 284 KB | 10.6 s cold / 0.07–0.23 s warm | PASS |
+| `/markets` | 200 | 284 KB | 10.6 s cold / 0.07-0.23 s warm | PASS |
 | `/portfolio` | 200 | 24 KB | 0.018 s | PASS |
 | `/create` | 200 | 33 KB | 0.031 s | PASS |
 | `/markets/{primary}` | 200 | 90 KB | 0.289 s | PASS |
@@ -508,7 +510,7 @@ repeated network calls.
 
 ## Bugs Found
 
-No new defects in this pass. Bugs 1–14 are recorded in `docs/QA_REPORT.md`; 15–20 were found
+No new defects in this pass. Bugs 1-14 are recorded in `docs/QA_REPORT.md`; 15-20 were found
 in the previous audit pass and are re-verified as fixed here.
 
 | Bug | Severity | Fix | Retest |

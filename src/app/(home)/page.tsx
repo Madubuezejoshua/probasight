@@ -168,7 +168,7 @@ export default async function HomePage() {
               Non-custodial by construction
             </h2>
             <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-[var(--color-muted)]">
-              Panta Pulse never holds your keys or your funds. Every on-chain action is
+              ProbaSight never holds your keys or your funds. Every on-chain action is
               built by Panta, signed by your wallet, and broadcast to Solana with your
               explicit approval.
             </p>

@@ -1,4 +1,4 @@
-# Panta Pulse: Submission
+# ProbaSight: Submission
 
 Written for: Colosseum Crypto World's Fair judges and the Panta API Sidetrack reviewers.
 
@@ -6,7 +6,7 @@ Written for: Colosseum Crypto World's Fair judges and the Panta API Sidetrack re
 
 ## Project name
 
-**Panta Pulse**
+**ProbaSight**
 
 ## One-line description
 
@@ -34,7 +34,7 @@ underlying event.
 
 ## The solution
 
-Panta Pulse puts a structured research layer directly between discovery and execution.
+ProbaSight puts a structured research layer directly between discovery and execution.
 
 Every market page can generate an **AI Market Intelligence** pass built from one source: that
 market's own live Panta data, catalog fields, phase, YES/NO pricing, timing, resolution
@@ -71,7 +71,7 @@ it and there is no product left.
 - **The AI layer has nothing to analyse without Panta**: the entire context object is
   assembled from Panta responses.
 
-Panta Pulse contributes the intelligence layer, the terminal UX, and the non-custodial
+ProbaSight contributes the intelligence layer, the terminal UX, and the non-custodial
 client architecture. Panta contributes everything underneath.
 
 ## Exact Panta API features used
@@ -210,7 +210,7 @@ analysis, is the template any Panta integrator would need.
 ### 6. Traction
 
 See `TRACTION_CHECKLIST.md` for the measurement plan. Panta attribution is correctly wired,
-so trades executed through Panta Pulse are attributable to this integration via
+so trades executed through ProbaSight are attributable to this integration via
 `POST /trades/` and visible in `GET /account/metrics/`. **Traction numbers below are
 placeholders and must be filled with real figures before submission.**
 
@@ -243,7 +243,7 @@ measurements, see `TRACTION_CHECKLIST.md`.**
 - Deployed visitors: _____
 - Wallets connected: _____
 - Panta-attributed trades: _____
-- Markets created through Panta Pulse: _____
+- Markets created through ProbaSight: _____
 - Testers completing the full loop: _____
 - Tester feedback: _____
 

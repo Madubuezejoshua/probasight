@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ConnectWalletButton } from "@/components/wallet/ConnectWalletButton";
-import { PulseGlyph, Wordmark } from "./Logo";
+import { ProbaSightMark, ProbaSightWordmark } from "./Logo";
 import { cn } from "@/lib/utils/cn";
 
 const NAV = [
@@ -60,10 +60,10 @@ export function Header() {
         <Link
           href="/"
           className="flex shrink-0 items-center gap-2"
-          aria-label="Panta Pulse home"
+          aria-label="ProbaSight home"
         >
-          <PulseGlyph className="h-7 w-7" />
-          <Wordmark className="hidden text-[15px] sm:inline" />
+          <ProbaSightMark className="h-7 w-7" />
+          <ProbaSightWordmark className="hidden text-[15px] sm:inline" />
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PoweredByPanta } from "@/components/common/PoweredByPanta";
-import { PulseGlyph, Wordmark } from "./Logo";
+import { ProbaSightMark, ProbaSightWordmark } from "./Logo";
 
 export function Footer() {
   return (
@@ -9,8 +9,8 @@ export function Footer() {
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-md">
             <div className="flex items-center gap-2">
-              <PulseGlyph className="h-6 w-6" />
-              <Wordmark className="text-sm" />
+              <ProbaSightMark className="h-6 w-6" />
+              <ProbaSightWordmark className="text-sm" />
             </div>
             <p className="mt-3 text-sm leading-relaxed text-[var(--color-muted)]">
               An AI-powered prediction-market intelligence and trading terminal. Market
@@ -85,7 +85,7 @@ export function Footer() {
 
         <div className="mt-8 border-t border-[var(--color-border-subtle)] pt-5">
           <p className="text-xs leading-relaxed text-[var(--color-faint)]">
-            Panta Pulse is an independent interface built on the Panta public API. It is
+            ProbaSight is an independent interface built on the Panta public API. It is
             not operated or endorsed by Panta. Prediction markets carry risk of total
             loss. Nothing in this interface, including AI-generated analysis, is financial
             advice. Verify each market&apos;s resolution rules before trading.

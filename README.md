@@ -1,8 +1,8 @@
-# Panta Pulse
+# ProbaSight
 
 **An AI-powered prediction-market intelligence and trading terminal built on Panta.**
 
-Panta Pulse turns Panta's prediction-market infrastructure into a professional research
+ProbaSight turns Panta's prediction-market infrastructure into a professional research
 and trading surface: discover markets, understand them through structured AI analysis,
 connect a Solana wallet, trade YES/NO, track positions, claim winnings, create new markets,
 and claim creator fees, all non-custodially.
@@ -240,7 +240,7 @@ Win claims and primary buys are reported to `POST /trades/` for volume attributi
 
 ## Wallet security model
 
-- Panta Pulse **never** asks for, receives, stores or transmits a private key or seed phrase.
+- ProbaSight **never** asks for, receives, stores or transmits a private key or seed phrase.
 - The wallet adapter yields a **public key** and a **signature**, nothing more.
 - Every on-chain action requires an **explicit in-wallet approval**. There is no automatic
   signing and no silent retry of a signing prompt.

@@ -159,7 +159,7 @@ export function PortfolioDashboard() {
         </h2>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-[var(--color-muted)]">
           Your wallet is your identity here. There is no account to create and no password
-          to set. Panta Pulse reads your positions and activity directly from Panta using
+          to set. ProbaSight reads your positions and activity directly from Panta using
           your public address.
         </p>
         <div className="mt-6 flex justify-center">
@@ -633,7 +633,7 @@ function CreatedMarkets({
     return (
       <EmptyState
         title="No created markets"
-        description="Markets you create through Panta Pulse appear here. Panta scopes creation history to the API account, so only markets created through this application are listed."
+        description="Markets you create through ProbaSight appear here. Panta scopes creation history to the API account, so only markets created through this application are listed."
         action={
           <Link href="/create" className="pp-btn pp-btn-primary">
             Create a market

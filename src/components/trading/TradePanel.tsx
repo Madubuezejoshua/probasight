@@ -352,7 +352,7 @@ export function TradePanel({
       </div>
 
       <p className="pp-hint mt-3">
-        Your wallet signs every transaction. Panta Pulse never holds your keys or funds.
+        Your wallet signs every transaction. ProbaSight never holds your keys or funds.
       </p>
       <PoweredByPanta variant="subtle" className="mt-3" />
     </PanelShell>

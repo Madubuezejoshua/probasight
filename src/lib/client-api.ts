@@ -91,7 +91,7 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     throw new ApiError(
       {
         code: "NETWORK_ERROR",
-        message: "Could not reach the Panta Pulse server. Check your connection.",
+        message: "Could not reach the ProbaSight server. Check your connection.",
         retryable: true,
       },
       0,

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Panta Pulse design system.
+ * ProbaSight design system.
  *
  * Dark-first professional terminal. The brand accent is teal; YES/NO green and
  * red are semantic state colours only and are never used as brand surfaces.
@@ -259,7 +259,7 @@
   }
 
   /* Quiet status pulse. Deliberately slow: nothing here should read as a casino. */
-  @keyframes pp-pulse {
+  @keyframes ps-pulse {
     0%,
     100% {
       opacity: 1;
@@ -269,7 +269,7 @@
     }
   }
   .pp-live-dot {
-    animation: pp-pulse 2.4s ease-in-out infinite;
+    animation: ps-pulse 2.4s ease-in-out infinite;
   }
 }
 
@@ -285,7 +285,7 @@
 }
 
 /*
- * Wallet adapter modal restyled to the Panta Pulse surface.
+ * Wallet adapter modal restyled to the ProbaSight surface.
  * The library ships a light-leaning default that would break the terminal look.
  */
 .wallet-adapter-modal-wrapper {

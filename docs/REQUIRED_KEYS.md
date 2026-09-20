@@ -46,7 +46,7 @@ Mint one with your existing access token or your current key:
 curl -X POST https://live-api.panta.market/api/v1/account/keys/ \
   -H "X-Api-Key: <your existing pk_test_ key>" \
   -H "Content-Type: application/json" \
-  -d '{"env":"live","name":"panta-pulse-live","revokeOthers":false}'
+  -d '{"env":"live","name":"probasight-live","revokeOthers":false}'
 ```
 
 Copy the returned `secret` into `PANTA_API_KEY`. As always it is shown **once only**.
@@ -60,14 +60,14 @@ Panta's public API needs a developer account. Per
 # 1. Register: returns { access, refresh, userId, email, name }
 curl -X POST https://live-api.panta.market/api/v1/auth/register/ \
   -H "Content-Type: application/json" \
-  -d '{"email":"you@example.com","password":"<a strong password>","name":"Panta Pulse"}'
+  -d '{"email":"you@example.com","password":"<a strong password>","name":"ProbaSight"}'
 
 # 2. Mint an API key with the access token from step 1.
 #    The plaintext `secret` is returned ONCE and never again.
 curl -X POST https://live-api.panta.market/api/v1/account/keys/ \
   -H "Authorization: Bearer <access>" \
   -H "Content-Type: application/json" \
-  -d '{"name":"panta-pulse"}'
+  -d '{"name":"probasight"}'
 
 # 3. Confirm it works and that market creation is permitted.
 curl https://live-api.panta.market/api/v1/account/ \
@@ -113,7 +113,7 @@ For Vercel, add the same variables in **Project → Settings → Environment Var
 | --- | --- | --- |
 | Phantom or Solflare on mainnet | Signs every transaction | N/A |
 | SOL in that wallet | Solana network fees | 0.05 SOL is plenty |
-| USDC in that wallet | The trade deposit itself | 5–20 USDC for one test trade |
+| USDC in that wallet | The trade deposit itself | 5-20 USDC for one test trade |
 | More USDC | Market creation fee, quoted by Panta before you sign | Panta quotes this exactly; its example is 50 USDC. **Read the quote before approving.** |
 
 The create flow shows the exact fee and a warning that signing spends real funds, before
@@ -123,7 +123,7 @@ any wallet prompt appears.
 
 ## 5. Exact final E2E procedure for tomorrow
 
-Run these in order. Steps 1–5 need no funds.
+Run these in order. Steps 1-5 need no funds.
 
 ### Step 0: configure and start
 
