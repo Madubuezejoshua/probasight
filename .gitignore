@@ -2,7 +2,7 @@
 #
 # These patterns are ROOT-ANCHORED with a leading slash on purpose. An unanchored
 # `build` matches a directory named `build` at ANY depth, which silently excluded
-# four API routes that live at .../build/route.ts — the trade, create and claim
+# four API routes that live at .../build/route.ts: the trade, create and claim
 # transaction builders. They were missing from the repository and therefore from
 # the deployed app, while still working locally. Keep the leading slash.
 /node_modules
@@ -11,7 +11,7 @@
 /build
 /coverage
 
-# Environment — never commit real credentials.
+# Environment. Never commit real credentials.
 .env
 .env.local
 .env*.local

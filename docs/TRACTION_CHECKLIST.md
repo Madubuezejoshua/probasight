@@ -12,7 +12,7 @@ already exist or Panta's own attribution data.
 
 ---
 
-## 1. Panta-attributed trades — the strongest metric
+## 1. Panta-attributed trades: the strongest metric
 
 This is the number the Panta Sidetrack cares about most, and it is the one you can prove.
 
@@ -31,7 +31,7 @@ Record from the response:
 | Figure | Field |
 | --- | --- |
 | Total attributed trades | `summary.trades.total` |
-| Attributed volume (USDC base units) | `summary.trades.volumeUsdcBase` — divide by 1,000,000 |
+| Attributed volume (USDC base units) | `summary.trades.volumeUsdcBase`, divide by 1,000,000 |
 | Breakdown by kind (buy vs claim) | `summary.trades.byKind` |
 | Markets created via Panta Pulse | `summary.creates.total` |
 
@@ -103,7 +103,7 @@ Ask each tester directly and count confirmations. Record honestly:
 - Testers who started but did not finish: _____
 - Where they dropped off: _____
 
-Drop-off data is genuinely useful to a judge — it reads as real usage, not marketing.
+Drop-off data is genuinely useful to a judge, it reads as real usage, not marketing.
 
 ## 6. Markets created
 

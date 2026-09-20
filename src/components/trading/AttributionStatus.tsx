@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils/cn";
 /**
  * Panta attribution status for a broadcast signature.
  *
- * Reporting a trade to Panta is only half of attribution — the other half is
+ * Reporting a trade to Panta is only half of attribution, the other half is
  * being able to confirm Panta actually recorded it. Panta indexes
  * asynchronously, so a freshly-broadcast trade legitimately reads
  * `pending_attribution` for a while.

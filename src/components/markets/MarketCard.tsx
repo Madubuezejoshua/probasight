@@ -65,7 +65,7 @@ export function MarketCard({ market }: { market: PantaMarket }) {
           <div className="rounded-[var(--radius-control)] border border-dashed border-[var(--color-border-subtle)] px-3 py-3 text-center">
             <p className="text-xs text-[var(--color-muted)]">
               {market.phase === "resolved"
-                ? "Market resolved — see settlement"
+                ? "Market resolved, see settlement"
                 : market.phase === "cancelled"
                   ? "Market cancelled"
                   : "Live price available on the market page"}

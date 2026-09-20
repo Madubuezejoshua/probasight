@@ -204,7 +204,7 @@ export function useCreateFlow() {
           ...shape,
           message:
             shape.code === "TX_NOT_FOUND"
-              ? `Panta has not observed the transaction yet. It was broadcast as ${signature} — retry registration in a moment.`
+              ? `Panta has not observed the transaction yet. It was broadcast as ${signature}. Retry registration in a moment.`
               : shape.message,
           details: { ...shape.details, signature },
         });

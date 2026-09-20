@@ -10,7 +10,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: {
-    default: "Panta Pulse — Prediction markets, understood",
+    default: "Panta Pulse: Prediction markets, understood",
     template: "%s · Panta Pulse",
   },
   description:
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     "forecasting",
   ],
   openGraph: {
-    title: "Panta Pulse — Prediction markets, understood",
+    title: "Panta Pulse: Prediction markets, understood",
     description:
       "Real-time Panta market intelligence, AI analysis, and on-chain trading in one terminal.",
     type: "website",

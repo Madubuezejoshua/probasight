@@ -6,7 +6,7 @@
  * always preferable to an invented number.
  */
 
-export const UNAVAILABLE = "—";
+export const UNAVAILABLE = "N/A";
 
 const USDC_DECIMALS = 6;
 const BASE_UNIT = 1_000_000;

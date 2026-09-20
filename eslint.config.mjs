@@ -8,7 +8,7 @@ import { FlatCompat } from "@eslint/eslintrc";
  * `eslint-config-next` 15.x ships only an eslintrc-style config with no flat
  * subpath exports, so it is bridged through `FlatCompat`. Do not "simplify"
  * this to a direct import unless the project moves to Next 16, whose config
- * package does export real flat arrays — and note that Next 16 also enables
+ * package does export real flat arrays, and note that Next 16 also enables
  * `react-hooks/set-state-in-effect`, which this codebase does not currently
  * satisfy. See REPORT.md §15 (Bug 20) for the full reasoning.
  */

@@ -14,7 +14,7 @@ import "@solana/wallet-adapter-react-ui/styles.css";
  *
  * Keys never leave the wallet: this app only ever receives a public key and a
  * signed transaction. `autoConnect` is enabled so a previously authorised
- * wallet reconnects, which is a connection, not a signing approval — every
+ * wallet reconnects, which is a connection, not a signing approval, every
  * transaction still requires an explicit in-wallet confirmation.
  */
 export function SolanaWalletProvider({ children }: { children: React.ReactNode }) {

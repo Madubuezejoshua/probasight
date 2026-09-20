@@ -23,7 +23,7 @@ export type ErrorEnvelope = {
  * The single exit point for a failed route.
  *
  * Server-side failures are logged here with their code and status so they are
- * diagnosable, while the browser only ever receives the normalised envelope —
+ * diagnosable, while the browser only ever receives the normalised envelope,
  * never a stack trace and never anything that could contain a credential.
  */
 export function errorResponse(err: unknown): NextResponse<ErrorEnvelope> {

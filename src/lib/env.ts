@@ -1,7 +1,7 @@
 /**
  * Central environment access.
  *
- * Server secrets are read lazily and never imported into client bundles —
+ * Server secrets are read lazily and never imported into client bundles,
  * `src/lib/panta/client.ts` and `src/lib/ai/groq.ts` are the only consumers
  * of the server half and both are marked `server-only`.
  */

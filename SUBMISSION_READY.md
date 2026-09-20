@@ -1,4 +1,4 @@
-# Panta Pulse — Submission Readiness
+# Panta Pulse: Submission Readiness
 
 Short version of `REPORT.md`. Every line here is backed by something executed during the
 final audit; anything not executed says **BLOCKED**, never PASS.
@@ -7,7 +7,7 @@ final audit; anything not executed says **BLOCKED**, never PASS.
 
 ## Status
 
-**READY — pending the owner actions in the last section.**
+**READY: pending the owner actions in the last section.**
 
 The software is complete, verified against the live production Panta API, and deployable.
 What remains is not code: a funded wallet for the one on-chain signature, a deployment, and
@@ -20,11 +20,11 @@ the submission forms.
 | Check | Command | Result |
 | --- | --- | --- |
 | Install | `npm ci` | PASS |
-| Lint | `npx eslint .` | **PASS** — 0 errors, 0 warnings |
-| Typecheck | `npx tsc --noEmit` | **PASS** — 0 errors, strict |
-| Unit tests | `npx vitest run` | **PASS — 133 / 133 across 10 files** |
-| Production build | `npx next build` | **PASS** — all 20 API routes emitted, 103 kB shared JS |
-| `npm audit` | — | 0 critical, 1 high (`postcss`, build-time only — see REPORT.md) |
+| Lint | `npx eslint .` | **PASS**: 0 errors, 0 warnings |
+| Typecheck | `npx tsc --noEmit` | **PASS**: 0 errors, strict |
+| Unit tests | `npx vitest run` | **PASS: 133 / 133 across 10 files** |
+| Production build | `npx next build` | **PASS**: all 20 API routes emitted, 103 kB shared JS |
+| `npm audit` | N/A | 0 critical, 1 high (`postcss`, build-time only, see REPORT.md) |
 
 ---
 
@@ -41,17 +41,17 @@ the submission forms.
 | AI intelligence | **PASS** | Schema-valid 7-section analysis on all 3 demo markets |
 | AI refusal on no-question markets | **PASS** | `MARKET_QUESTION_UNAVAILABLE`; Analyze button hidden |
 | Wallet connect (Phantom / Solflare) | **BLOCKED** | Browser extension + human action |
-| Trading — quote | **PASS** | `qt_687e6694…`, 1.996363 shares, avg 0.50091, fee 0.02 |
-| Trading — build | **PASS** | `ord_1c1420f5…`, 2 instructions, blockhash, lastValidBlockHeight |
-| Trading — transaction construction | **PASS** | Compiled to a valid 696-byte v0 tx, 1 signature, round-trips |
-| Trading — signature / broadcast | **BLOCKED** | Funded wallet + human approval |
+| Trading, quote | **PASS** | `qt_687e6694…`, 1.996363 shares, avg 0.50091, fee 0.02 |
+| Trading, build | **PASS** | `ord_1c1420f5…`, 2 instructions, blockhash, lastValidBlockHeight |
+| Trading, transaction construction | **PASS** | Compiled to a valid 696-byte v0 tx, 1 signature, round-trips |
+| Trading, signature / broadcast | **BLOCKED** | Funded wallet + human approval |
 | Portfolio positions | **PASS** | `GET /positions/` 200, empty array → honest empty state |
 | Wallet activity | **PASS** | `GET /wallets/{w}/trades/` 200 |
 | Claim eligibility | **PASS** | Correctly refuses with `NOT_CLAIMABLE` |
 | Winnings claim execution | **BLOCKED** | Requires a winning position |
-| Market creation — quote | **PASS** | 50.00 USDC (10.00 liquidity + 40.00 platform), real `expectedEventPda` |
-| Market creation — image upload | **PASS** | Real signed Cloudinary form returned |
-| Market creation — sign / register | **BLOCKED** | Costs a real 50 USDC fee |
+| Market creation, quote | **PASS** | 50.00 USDC (10.00 liquidity + 40.00 platform), real `expectedEventPda` |
+| Market creation, image upload | **PASS** | Real signed Cloudinary form returned |
+| Market creation, sign / register | **BLOCKED** | Costs a real 50 USDC fee |
 | Creator fees | **PASS (refusal verified)** | `NOT_MARKET_CREATOR`; correctly does **not** post to `/trades/` |
 | Trade attribution | **PASS** | Panta memo decoded on-chain: `panta:v1:usr_…:qt_…:ord_…` |
 | "Powered by Panta" | **PASS** | Exact wording on every Panta-powered surface |
@@ -61,7 +61,7 @@ the submission forms.
 ## Panta Integration
 
 All **18** endpoints this integration needs are wired to real surfaces, verified path-by-path
-against the current `llms.txt` (re-fetched during the audit — unchanged).
+against the current `llms.txt` (re-fetched during the audit, unchanged).
 
 Catalog · market detail · trade tape · wallet trades · positions · categories · primary-buy
 quote/build/submit/verify · trade report · trade status · win claim · creator-fee claim ·
@@ -80,16 +80,16 @@ broadcast.
 | --- | --- |
 | Browse → filter → market detail → activity | **EXECUTED** |
 | AI analysis (3 markets) | **EXECUTED** |
-| Connect wallet | **BLOCKED** — human action |
+| Connect wallet | **BLOCKED**: human action |
 | Quote | **EXECUTED** |
 | Build | **EXECUTED** |
-| Compile transaction | **EXECUTED** — 696 bytes, valid |
-| Signature | **BLOCKED** — manual wallet approval required |
-| Broadcast / confirm / submit / report | **BLOCKED** — funded wallet required |
+| Compile transaction | **EXECUTED**: 696 bytes, valid |
+| Signature | **BLOCKED**: manual wallet approval required |
+| Broadcast / confirm / submit / report | **BLOCKED**: funded wallet required |
 | Portfolio positions / activity / created markets | **EXECUTED** |
-| Claim | **BLOCKED** — claimable winning position required |
+| Claim | **BLOCKED**: claimable winning position required |
 | Creation quote + image upload | **EXECUTED** |
-| Creation sign / register | **BLOCKED** — real 50 USDC fee |
+| Creation sign / register | **BLOCKED**: real 50 USDC fee |
 
 ---
 
@@ -97,12 +97,12 @@ broadcast.
 
 | Criterion | Status |
 | --- | --- |
-| Panta API Integration | **READY** — 18/18 endpoints, server-only key, correct attribution asymmetry |
-| Technical Execution | **READY** — both tx shapes, expiry handling, 20+ distinct error states, 133 tests |
-| Product & UX | **READY** — no login, readable pricing, real mobile bottom sheet, honest empty states |
-| Originality | **READY** — structured AI layer that refuses rather than fabricates |
-| Impact Potential | **READY** — zero hardcoded market ids; live catalog spans 6 categories |
-| Traction | **READY to collect** — attribution wired; no figures invented |
+| Panta API Integration | **READY**: 18/18 endpoints, server-only key, correct attribution asymmetry |
+| Technical Execution | **READY**: both tx shapes, expiry handling, 20+ distinct error states, 133 tests |
+| Product & UX | **READY**: no login, readable pricing, real mobile bottom sheet, honest empty states |
+| Originality | **READY**: structured AI layer that refuses rather than fabricates |
+| Impact Potential | **READY**: zero hardcoded market ids; live catalog spans 6 categories |
+| Traction | **READY to collect**: attribution wired; no figures invented |
 
 ---
 
@@ -154,7 +154,7 @@ Never prefix the two secrets with `NEXT_PUBLIC_`.
 1. **Rotate credentials** (Panta with `revokeOthers: true`, Groq, Helius).
 2. **Deploy to Vercel** and enter the six variables above.
 3. **Smoke-test the deployment**: `/`, `/markets`, a market page, run the AI.
-4. **Reject a wallet signature** — confirm it reads `WALLET_REJECTED`, not a network error.
+4. **Reject a wallet signature**: confirm it reads `WALLET_REJECTED`, not a network error.
 5. **Execute one real trade** with a funded wallet; record the signature.
 6. **Verify attribution**: `GET /api/panta/trades/<signature>` → `processed`.
 7. **Responsive pass** at 360 / 390 / 430 / 768 / 1024 / 1440 px with devtools.

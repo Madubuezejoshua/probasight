@@ -8,7 +8,7 @@ import { z } from "zod";
  * abuse early and return a structured error the UI can render.
  */
 
-/** Base58 alphabet, 32-44 chars — the shape of a Solana public key. */
+/** Base58 alphabet, 32-44 chars, the shape of a Solana public key. */
 const BASE58 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 /** Base58 transaction signature (64 bytes encoded). */
 const SIGNATURE = /^[1-9A-HJ-NP-Za-km-z]{64,90}$/;

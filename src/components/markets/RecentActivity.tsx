@@ -164,7 +164,7 @@ function SideTag({ trade }: { trade: PantaCatalogTrade }) {
       <span
         className={`inline-flex items-center rounded-[var(--radius-chip)] border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${tone}`}
       >
-        {side ?? "—"}
+        {side ?? UNAVAILABLE}
       </span>
       <span className="text-[10px] uppercase tracking-wider text-[var(--color-faint)]">
         {phase}

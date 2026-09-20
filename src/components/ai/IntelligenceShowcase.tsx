@@ -52,7 +52,7 @@ export function IntelligenceShowcase({ market }: { market: PantaMarket | null })
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-[var(--color-muted)]">
             Every analysis is generated on demand from one thing: a live snapshot of that
-            market&apos;s own Panta data — catalog fields, phase, YES/NO pricing, timing,
+            market&apos;s own Panta data: catalog fields, phase, YES/NO pricing, timing,
             resolution metadata and the recent trade tape.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-[var(--color-muted)]">

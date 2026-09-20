@@ -20,7 +20,7 @@ const ORIGINAL_ENV = { ...process.env };
 
 /**
  * Builds a FRESH Response each call. A Response body may only be read once, so
- * a shared instance would make the second retry throw "Body is unusable" —
+ * a shared instance would make the second retry throw "Body is unusable",
  * an artefact of mocking, not of the client.
  */
 function jsonResponse(status: number, body: unknown): Response {

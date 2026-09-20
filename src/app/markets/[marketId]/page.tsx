@@ -155,7 +155,7 @@ export default async function MarketDetailPage({ params }: PageProps) {
                   <p className="mt-1 text-xs leading-relaxed text-[var(--color-muted)]">
                     Panta did not return spot YES/NO prices for this market
                     {market.phase === "resolved"
-                      ? " because it has resolved — settlement is 1 USDC per winning share."
+                      ? " because it has resolved. Settlement is 1 USDC per winning share."
                       : " right now. Requesting a quote still returns the exact fill before you sign."}
                   </p>
                 </div>

@@ -1,4 +1,4 @@
-# Panta Pulse — Submission
+# Panta Pulse: Submission
 
 Written for: Colosseum Crypto World's Fair judges and the Panta API Sidetrack reviewers.
 
@@ -16,7 +16,7 @@ An AI-powered prediction-market intelligence and trading terminal built on Panta
 
 ## The problem
 
-Prediction markets produce genuinely useful information — a continuously-updated,
+Prediction markets produce genuinely useful information, a continuously-updated,
 money-backed probability for a real-world question. But the interface layer around them is
 built for people who already know how to read a market.
 
@@ -37,7 +37,7 @@ underlying event.
 Panta Pulse puts a structured research layer directly between discovery and execution.
 
 Every market page can generate an **AI Market Intelligence** pass built from one source: that
-market's own live Panta data — catalog fields, phase, YES/NO pricing, timing, resolution
+market's own live Panta data, catalog fields, phase, YES/NO pricing, timing, resolution
 metadata, and the recent trade tape. It returns a fixed structure: summary, current market
 view, activity analysis, a balanced YES case and NO case, key uncertainties, and an explicit
 list of data limitations.
@@ -59,7 +59,7 @@ surface rather than two products.
 
 ## Why Panta is essential
 
-Panta is not a data source bolted onto this product — it is the entire market layer. Remove
+Panta is not a data source bolted onto this product, it is the entire market layer. Remove
 it and there is no product left.
 
 - **Markets** come from the Panta catalog: discovery, detail, pricing, phase, resolution.
@@ -68,7 +68,7 @@ it and there is no product left.
 - **Positions and settlement** come from Panta, including claim eligibility.
 - **Market creation** is Panta's create session, fee quote, transaction build and register.
 - **Creator economics** are Panta's creator-fee vault and claim flow.
-- **The AI layer has nothing to analyse without Panta** — the entire context object is
+- **The AI layer has nothing to analyse without Panta**: the entire context object is
   assembled from Panta responses.
 
 Panta Pulse contributes the intelligence layer, the terminal UX, and the non-custodial
@@ -101,7 +101,7 @@ All 18 documented endpoints this integration needs, every one wired to a real su
 
 **Attribution is treated as a first-class step, not an afterthought.** Primary buys and win
 claims are explicitly reported to `POST /trades/`. Creator-fee claims deliberately are *not*,
-because Panta rejects those signatures with `TX_MISMATCH` — the asymmetry is implemented
+because Panta rejects those signatures with `TX_MISMATCH`, the asymmetry is implemented
 rather than glossed over.
 
 ---
@@ -135,7 +135,7 @@ Design decisions worth noting:
   so a client component importing one fails the build instead of leaking at runtime. The
   built bundle was scanned to confirm no server env var reaches the browser.
 - **Post-broadcast honesty.** Once a transaction lands, a later failure is a bookkeeping
-  problem, not a lost trade — the UI says exactly that and shows the signature, rather than a
+  problem, not a lost trade, the UI says exactly that and shows the signature, rather than a
   generic error that would make a user think their funds vanished.
 - **Expiry handling.** Panta quotes (~90s), orders (~120s) and create sessions (~5min) are
   counted down in the UI and invalidated on expiry. Stale session data is never re-signed.
@@ -154,7 +154,7 @@ Design decisions worth noting:
 ## Non-custodial wallet model
 
 - No private key or seed phrase is ever requested, received, stored or transmitted.
-- The wallet yields a public key and a signature — nothing else.
+- The wallet yields a public key and a signature, nothing else.
 - Every on-chain action requires explicit in-wallet approval. No automatic signing, and no
   silent retry of a signing prompt.
 - Signed bytes go from the browser straight to the Solana RPC; the server never sees them.
@@ -168,7 +168,7 @@ Design decisions worth noting:
 ### 1. Panta API Integration
 
 All 18 endpoints above, spanning every documented functional group: catalog, orders,
-positions, claims, creation and attribution. Panta is structurally load-bearing — the product
+positions, claims, creation and attribution. Panta is structurally load-bearing, the product
 does not exist without it. "Powered by Panta" appears on every Panta-powered surface per
 Terms §6.
 
@@ -197,15 +197,15 @@ balanced YES/NO framing, and a mandatory data-limitations section. It sits adjac
 trade ticket, making research and execution one surface.
 
 The activity chart is a second example of the same principle: rather than fake a price line
-from data that cannot support one, it charts cumulative share flow — which is genuinely
-derivable — and labels exactly why.
+from data that cannot support one, it charts cumulative share flow, which is genuinely
+derivable, and labels exactly why.
 
 ### 5. Impact Potential
 
 One interface works across every Panta category with no per-category code. It demonstrates
 Panta as embeddable intelligence and trading infrastructure rather than a single-vertical
-integration, and the same architecture — server-side key, non-custodial signing, structured
-analysis — is the template any Panta integrator would need.
+integration, and the same architecture, server-side key, non-custodial signing, structured
+analysis, is the template any Panta integrator would need.
 
 ### 6. Traction
 
@@ -238,7 +238,7 @@ placeholders and must be filled with real figures before submission.**
 ## Traction
 
 **All figures below are placeholders. Do not submit without replacing them with real
-measurements — see `TRACTION_CHECKLIST.md`.**
+measurements, see `TRACTION_CHECKLIST.md`.**
 
 - Deployed visitors: _____
 - Wallets connected: _____
@@ -253,21 +253,21 @@ measurements — see `TRACTION_CHECKLIST.md`.**
 
 Stated plainly. Each is a property of the current Panta API, not an unfinished feature:
 
-1. **No catalog text search** — `GET /markets/` exposes no search parameter, so search
+1. **No catalog text search**: `GET /markets/` exposes no search parameter, so search
    filters loaded markets and the UI labels it that way.
-2. **List rows carry no prices** — we enrich the first 12 per page via market detail; beyond
+2. **List rows carry no prices**: we enrich the first 12 per page via market detail; beyond
    that, cards say pricing is on the market page rather than inventing a number.
-3. **No price chart is derivable** — trade rows carry share quantities and fees but never the
+3. **No price chart is derivable**: trade rows carry share quantities and fees but never the
    USDC spent. We chart cumulative share flow instead and explain why.
-4. **No P&L** — positions have no entry price or cost basis, so it cannot be computed
+4. **No P&L**: positions have no entry price or cost basis, so it cannot be computed
    unambiguously. Estimated mark-to-market value is shown where a price exists;
    "Value unavailable" where it does not.
-5. **Created markets are account-scoped** — `createdBy=me` is scoped to the API account, not
+5. **Created markets are account-scoped**: `createdBy=me` is scoped to the API account, not
    a wallet. We filter by `creatorAddress` when present and disclose when we cannot. We did
    not add a database to work around it; Panta enforces ownership on the claim itself.
-6. **Secondary-phase trading is not offered** — the API exposes primary buys for this
+6. **Secondary-phase trading is not offered**: the API exposes primary buys for this
    integration, so the ticket does not pretend to offer sells or an order book.
-7. **In-process AI rate limiting** — per-instance on serverless, not a global quota.
+7. **In-process AI rate limiting**: per-instance on serverless, not a global quota.
 
 ## Submission checklist
 

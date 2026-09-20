@@ -16,9 +16,9 @@ import { UNAVAILABLE } from "@/lib/utils/format";
  *
  * Panta's docs describe startTime/endTime/resolutionTime as integer Unix
  * seconds, but the production catalog returns ISO-8601 strings. Treating only
- * one form as valid made every date on the market page render as "—".
+ * one form as valid made every date on the market page render as "-".
  */
-describe("unixToDate — both Panta wire formats", () => {
+describe("unixToDate, both Panta wire formats", () => {
   it("parses documented integer Unix seconds", () => {
     const date = unixToDate(1767225600);
     expect(date).not.toBeNull();
@@ -116,7 +116,7 @@ describe("create-form time helpers stay numeric", () => {
   });
 });
 
-describe("secondsUntilIso — quote and session expiry countdowns", () => {
+describe("secondsUntilIso, quote and session expiry countdowns", () => {
   it("computes remaining seconds from an ISO expiry", () => {
     const now = Date.parse("2026-09-04T16:26:00.000Z");
     expect(secondsUntilIso("2026-09-04T16:27:00.000Z", now)).toBe(60);

@@ -5,7 +5,7 @@
 Panta Pulse turns Panta's prediction-market infrastructure into a professional research
 and trading surface: discover markets, understand them through structured AI analysis,
 connect a Solana wallet, trade YES/NO, track positions, claim winnings, create new markets,
-and claim creator fees — all non-custodially.
+and claim creator fees, all non-custodially.
 
 Powered by Panta.
 
@@ -113,7 +113,7 @@ docs/          architecture, demo script, submission, keys, QA, traction
 
 - **Node.js 20 or newer** (built and verified on Node 24)
 - **npm 10+**
-- A **Panta API key** — see [Environment setup](#environment-setup)
+- A **Panta API key**: see [Environment setup](#environment-setup)
 - A **Solana wallet** (Phantom or Solflare) for any wallet-scoped action
 - USDC + a little SOL in that wallet to actually trade or create a market
 
@@ -142,7 +142,7 @@ cp .env.example .env.local
 | `PANTA_API_KEY` | **Yes** | Server | Authenticates every Panta call |
 | `PANTA_API_BASE_URL` | No | Server | Defaults to `https://live-api.panta.market/api/v1` |
 | `GROQ_API_KEY` | No | Server | AI Market Intelligence only |
-| `GROQ_MODEL` | No | Server | Defaults to `openai/gpt-oss-120b`. Never set a `groq/compound*` model — those have built-in web search |
+| `GROQ_MODEL` | No | Server | Defaults to `openai/gpt-oss-120b`. Never set a `groq/compound*` model, those have built-in web search |
 | `NEXT_PUBLIC_SOLANA_RPC_URL` | Recommended | Public | Broadcasting and confirming transactions |
 | `NEXT_PUBLIC_SOLANA_NETWORK` | No | Public | Explorer links; defaults to `mainnet-beta` |
 
@@ -152,9 +152,9 @@ Panta's public API requires a developer account. Per
 [the Panta quickstart](https://docs.panta.market/quickstart):
 
 1. `POST https://live-api.panta.market/api/v1/auth/register/` with your email, password and
-   name — this returns an `access` JWT.
+   name, this returns an `access` JWT.
 2. `POST https://live-api.panta.market/api/v1/account/keys/` with
-   `Authorization: Bearer <access>` — this returns the plaintext `secret`
+   `Authorization: Bearer <access>`, this returns the plaintext `secret`
    (`pk_test_…` or `pk_live_…`) **once and only once**.
 3. Put that secret in `PANTA_API_KEY`.
 
@@ -173,7 +173,7 @@ npm run dev
 
 Open <http://localhost:3000>.
 
-Without `PANTA_API_KEY` the application still builds and every page still renders — each
+Without `PANTA_API_KEY` the application still builds and every page still renders, each
 Panta-backed surface shows an explicit `PANTA_NOT_CONFIGURED` error state rather than
 fabricated placeholder data.
 
@@ -232,7 +232,7 @@ Panta returns two different things depending on the flow, and this matters:
 ### Attribution asymmetry
 
 Win claims and primary buys are reported to `POST /trades/` for volume attribution.
-**Creator-fee claims are deliberately not reported** — Panta rejects those signatures with
+**Creator-fee claims are deliberately not reported**: Panta rejects those signatures with
 `TX_MISMATCH`. This asymmetry is implemented explicitly in
 `src/components/portfolio/useClaimFlow.ts`.
 
@@ -257,7 +257,7 @@ Win claims and primary buys are reported to `POST /trades/` for volume attributi
 
 **Pages:** `/`, `/markets`, `/markets/[marketId]`, `/portfolio`, `/create`
 
-**API:** 21 route handlers under `/api/panta/*` and `/api/ai/*` — see the
+**API:** 21 route handlers under `/api/panta/*` and `/api/ai/*`, see the
 [Panta integration](#panta-integration) table, plus `/api/panta/created-markets`.
 
 Every mutating route validates its payload with Zod, enforces its HTTP method, normalises
@@ -302,7 +302,7 @@ Target: **Vercel**.
 1. Push the repository to GitHub.
 2. Import it in Vercel (framework auto-detects as Next.js).
 3. Add the environment variables from [Environment setup](#environment-setup).
-   Set `PANTA_API_KEY` and `GROQ_API_KEY` as server variables — do **not** prefix them.
+   Set `PANTA_API_KEY` and `GROQ_API_KEY` as server variables, do **not** prefix them.
 4. Deploy.
 
 Use a dedicated Solana RPC (Helius, QuickNode, Triton, Alchemy) rather than the public
@@ -330,13 +330,13 @@ and footer. **Do not remove, abbreviate, hide or conditionally render it.**
 These are properties of the current Panta API, stated plainly rather than papered over:
 
 1. **No text search.** `GET /markets/` supports `category`, `status`, `createdBy`, `cursor`
-   and `limit` — there is no search parameter. The search box filters markets already
+   and `limit`, there is no search parameter. The search box filters markets already
    loaded, and the UI says so.
 2. **List rows carry no prices.** Panta documents that list rows do not live-RPC for prices.
    We enrich the first 12 rows per page via market detail; beyond that, cards show
    "Live price available on the market page" rather than an invented number.
 3. **No price chart is possible from the public tape.** Catalog trade rows return share
-   quantities, a fee and a block time — never the USDC spent. A per-trade execution price
+   quantities, a fee and a block time, never the USDC spent. A per-trade execution price
    cannot be derived without assuming a fee rate, which would be fabricated. The market page
    therefore charts *cumulative YES/NO share flow*, which is genuinely derivable, and says so.
 4. **No P&L.** Positions return current shares only, with no entry price or cost basis, so

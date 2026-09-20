@@ -1,7 +1,7 @@
 /**
  * Display helpers for catalog rows.
  *
- * The live mainnet catalog returns `title` as an EMPTY STRING on every market —
+ * The live mainnet catalog returns `title` as an EMPTY STRING on every market,
  * the human-readable question actually lives in `description`. (The sandbox
  * catalog does populate `title`, which is why this only shows up against a
  * `pk_live_` key.) Rendering `title` directly leaves every card, heading and

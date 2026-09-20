@@ -19,7 +19,7 @@ export async function buildWinClaim(input: {
 /**
  * Withdraw accumulated creator fees on a graduated market.
  *
- * Per Panta docs this signature is NOT attributable via POST /trades/ —
+ * Per Panta docs this signature is NOT attributable via POST /trades/,
  * reporting it returns TX_MISMATCH. The creator-fee flow therefore ends at
  * broadcast plus on-chain confirmation, with no trade report.
  */

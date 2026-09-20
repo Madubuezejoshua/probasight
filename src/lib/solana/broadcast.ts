@@ -61,7 +61,7 @@ export function classifySigningError(err: unknown): AppError {
     return new AppError({
       code: "RPC_TIMEOUT",
       message:
-        "The Solana RPC did not confirm in time. The transaction may still land — check the signature before retrying.",
+        "The Solana RPC did not confirm in time. The transaction may still land. Check the signature before retrying.",
       retryable: true,
       status: 504,
     });

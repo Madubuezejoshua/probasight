@@ -10,7 +10,7 @@ import { unixToDate, type PantaTimestamp } from "@/lib/utils/time";
  * Note the two different shapes Panta returns: `GET /markets/` (list) sends
  * `title: ""` for most rows, while `GET /markets/{id}/` (detail) usually has
  * the real question. This check runs against detail, so it only refuses the
- * markets that are genuinely empty in both — still a meaningful share of the
+ * markets that are genuinely empty in both, still a meaningful share of the
  * live catalog.
  *
  * Refusing matters because a model handed a market with no question is free to

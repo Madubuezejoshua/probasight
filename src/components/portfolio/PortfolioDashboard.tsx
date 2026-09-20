@@ -159,7 +159,7 @@ export function PortfolioDashboard() {
         </h2>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-[var(--color-muted)]">
           Your wallet is your identity here. There is no account to create and no password
-          to set — Panta Pulse reads your positions and activity directly from Panta using
+          to set. Panta Pulse reads your positions and activity directly from Panta using
           your public address.
         </p>
         <div className="mt-6 flex justify-center">
@@ -446,7 +446,7 @@ function ClaimableList({
             {done && flow.result ? (
               <div className="mt-3 rounded-[var(--radius-control)] border border-[var(--color-yes)]/30 bg-[var(--color-yes-dim)]/40 p-3">
                 <p className="text-xs font-semibold text-[var(--color-yes)]">
-                  Claim submitted — {flow.result.amountLabel}
+                  Claim submitted: {flow.result.amountLabel}
                 </p>
                 <a
                   href={explorerTxUrl(flow.result.signature)}
@@ -683,7 +683,7 @@ function CreatedMarkets({
               {done && flow.result ? (
                 <div className="mt-3 rounded-[var(--radius-control)] border border-[var(--color-yes)]/30 bg-[var(--color-yes-dim)]/40 p-3">
                   <p className="text-xs font-semibold text-[var(--color-yes)]">
-                    Creator fees claimed — {flow.result.amountLabel}
+                    Creator fees claimed: {flow.result.amountLabel}
                   </p>
                   <a
                     href={explorerTxUrl(flow.result.signature)}

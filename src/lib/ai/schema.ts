@@ -33,7 +33,7 @@ export type MarketAnalysisResponse = {
 /**
  * Models occasionally wrap JSON in prose or code fences despite instructions.
  * This extracts the outermost JSON object before parsing. It never repairs
- * content — it only strips wrappers.
+ * content, it only strips wrappers.
  */
 export function extractJsonObject(text: string): string | null {
   const trimmed = text.trim();

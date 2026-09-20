@@ -5,7 +5,7 @@ import type { ApiErrorShape } from "@/lib/client-api";
  *
  * Panta's create quote and build can fail with a generic
  * `INVALID_MARKET_PARAMS` whose upstream message is only "unexpected create
- * quote/build failure — check server logs". That is accurate but useless to
+ * quote/build failure, check server logs". That is accurate but useless to
  * someone filling in a form, so we name the causes actually observed against
  * the live API instead of leaving the user stuck.
  *
@@ -29,7 +29,7 @@ export function CreateFailureHint({ error }: { error: ApiErrorShape }) {
         <li>
           <strong className="text-[var(--color-text)]">The image URL.</strong> Panta fetches
           it to validate. A URL that 404s, needs auth, or sits behind a private host is
-          rejected. Use the <strong>Upload image</strong> button — it goes through Panta&apos;s
+          rejected. Use the <strong>Upload image</strong> button, which goes through Panta&apos;s
           own uploader and always produces a URL it accepts.
         </li>
         <li>

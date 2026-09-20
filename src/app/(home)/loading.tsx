@@ -5,7 +5,7 @@ import { MarketGridSkeleton, Skeleton } from "@/components/common/States";
  *
  * It lives in a route group rather than at the app root on purpose: a root
  * `loading.tsx` creates a Suspense boundary above every route, which makes Next
- * stream a 200 before `notFound()` can run — so a missing market would render
+ * stream a 200 before `notFound()` can run, so a missing market would render
  * the 404 page with a 200 status. Scoping each boundary keeps streaming where
  * it helps without breaking 404s on /markets/[marketId].
  */

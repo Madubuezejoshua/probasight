@@ -87,7 +87,7 @@ export function MarketsExplorer({
    * `status=primary` returns a mix of cancelled, resolved and secondary rows,
    * and `status=resolved` returns nothing at all while resolved markets exist.
    * Sending it would produce visibly wrong results, so phase is filtered
-   * client-side on each row's actual `phase` field instead — see `visible`.
+   * client-side on each row's actual `phase` field instead, see `visible`.
    */
   const load = useCallback(async (nextCategory: string) => {
     const id = ++requestId.current;
@@ -223,7 +223,7 @@ export function MarketsExplorer({
               disabled={reloadingCategories}
               className="shrink-0 whitespace-nowrap rounded-[var(--radius-chip)] border border-dashed border-[var(--color-border-strong)] px-3 py-1.5 text-xs font-semibold text-[var(--color-muted)] transition-colors hover:text-[var(--color-text)] disabled:opacity-50"
             >
-              {reloadingCategories ? "Loading categories…" : "Categories unavailable — retry"}
+              {reloadingCategories ? "Loading categories…" : "Categories unavailable, retry"}
             </button>
           )}
         </div>

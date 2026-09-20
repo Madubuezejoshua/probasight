@@ -9,7 +9,7 @@ import { formatDateShort } from "@/lib/utils/time";
  * Cumulative share flow, drawn only from real Panta trade rows.
  *
  * Deliberately NOT a price chart. Panta's catalog trade rows carry share
- * quantities, a fee and a block time — they do not carry the USDC amount spent,
+ * quantities, a fee and a block time, they do not carry the USDC amount spent,
  * so a per-trade execution price cannot be derived from them. Inferring one
  * from `feePaid` would require assuming a fee rate, which would be fabricated
  * data. What IS honestly derivable is cumulative YES vs NO share demand over

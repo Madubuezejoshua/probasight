@@ -5,15 +5,15 @@ import { describe, expect, it } from "vitest";
 
 /**
  * Guards against source files that exist locally but are missing from the
- * repository — and therefore from every deployment.
+ * repository, and therefore from every deployment.
  *
  * This is not hypothetical. A `.gitignore` entry of `build` (intended for a
  * root build directory) is unanchored, so it matched a directory named `build`
  * at ANY depth. That silently excluded four API routes:
  *
- *   /api/panta/trade/build            — primary buy transaction builder
- *   /api/panta/create/build           — market creation transaction builder
- *   /api/panta/claims/winnings/build  — win claim builder
+ *   /api/panta/trade/build, primary buy transaction builder
+ *   /api/panta/create/build, market creation transaction builder
+ *   /api/panta/claims/winnings/build, win claim builder
  *   /api/panta/claims/creator-fees/build
  *
  * Every local check passed because the files were on disk. The deployed app had
@@ -73,7 +73,7 @@ describe("every source file is tracked by git", () => {
     const missing = routes.filter((f) => !tracked.has(f));
     expect(
       missing,
-      `API routes missing from the repository — these would 404 in production:\n${missing.join("\n")}`,
+      `API routes missing from the repository, these would 404 in production:\n${missing.join("\n")}`,
     ).toEqual([]);
     // Sanity check that the walk found routes at all, so an empty glob cannot
     // make this test vacuously pass.

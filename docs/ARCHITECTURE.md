@@ -32,12 +32,12 @@ market image bytes. Two things never touch the browser: `PANTA_API_KEY` and `GRO
 
 - base URL resolution from `PANTA_API_BASE_URL`
 - the `X-Api-Key` header, and optional `X-User-Id` for attribution
-- **trailing-slash enforcement** — Panta requires it on every path, and omitting it fails
+- **trailing-slash enforcement**: Panta requires it on every path, and omitting it fails
 - a 15s timeout via `AbortController`
 - cache policy: `revalidate` for public reads, `no-store` for anything wallet-scoped
 - rate-limit header capture (`X-RateLimit-*`)
 - error normalisation through `normalizePantaError`
-- logging that records route, status, Panta code and duration — and never a body or a secret
+- logging that records route, status, Panta code and duration, and never a body or a secret
 
 Everything above it is a thin typed wrapper: `markets.ts`, `orders.ts`, `positions.ts`,
 `claims.ts`, `create-market.ts`, `trades.ts`, `categories.ts`. Each is marked
@@ -79,7 +79,7 @@ Panta returns two different payload shapes and they are handled differently:
 playground's `instructionsToVersionedTx`: each instruction's base64 `data` becomes a Buffer,
 each account's `{pubkey, isSigner, isWritable}` becomes an `AccountMeta`, and the whole list
 is compiled with `TransactionMessage.compileToV0Message()` using the wallet as fee payer and
-Panta's blockhash. Instruction order is preserved — Panta declares it significant.
+Panta's blockhash. Instruction order is preserved. Panta declares it significant.
 
 `src/lib/solana/broadcast.ts` handles signing, broadcasting and confirmation, and
 `classifySigningError` maps wallet/RPC failures onto distinct codes. This matters because
@@ -91,13 +91,13 @@ declining must never be reported as a network failure.
 
 Three hooks own the multi-step flows, each with an explicit stage enum surfaced to the UI:
 
-- `useTradeFlow` — quote → build → sign → broadcast → confirm → submit → report → verify
-- `useClaimFlow` — build → sign → broadcast → confirm → (report, win claims only)
-- `useCreateFlow` — quote → build → sign → broadcast → confirm → register
+- `useTradeFlow`, quote → build → sign → broadcast → confirm → submit → report → verify
+- `useClaimFlow`, build → sign → broadcast → confirm → (report, win claims only)
+- `useCreateFlow`, quote → build → sign → broadcast → confirm → register
 
 **The post-broadcast boundary is the important design point.** Once a transaction is on
 chain, the user's funds have moved. A failure *after* that point is a bookkeeping problem,
-not a lost trade, and the UI says so and shows the signature — rather than reporting a
+not a lost trade, and the UI says so and shows the signature, rather than reporting a
 generic failure that would make a user think their money vanished.
 
 ---
@@ -110,7 +110,7 @@ This is easy to get wrong, so it is deliberate and documented in the code:
 | --- | --- |
 | Primary buy | **Yes** (`kind: buy`) |
 | Win claim | **Yes** (`kind: claim`) |
-| Creator-fee claim | **No** — Panta returns `TX_MISMATCH` |
+| Creator-fee claim | **No**: Panta returns `TX_MISMATCH` |
 
 `useClaimFlow` branches on `kind` for exactly this reason.
 
@@ -118,7 +118,7 @@ This is easy to get wrong, so it is deliberate and documented in the code:
 
 ## 5. Honest-data rules in code
 
-The specification's absolute rule — never fabricate market data — shows up as concrete
+The specification's absolute rule, never fabricate market data, shows up as concrete
 decisions:
 
 | Situation | What we do |
@@ -133,7 +133,7 @@ decisions:
 | AI has no data for a section | The prompt requires it to say so; empty arrays fail schema validation |
 | Panta key missing | `PANTA_NOT_CONFIGURED` error state, never placeholder markets |
 
-Every formatter returns `—` for missing input rather than a substituted zero.
+Every formatter returns `N/A` for missing input rather than a substituted zero.
 
 ---
 
@@ -145,11 +145,11 @@ Every formatter returns `—` for missing input rather than a substituted zero.
 2. Validate `marketId`.
 3. Fetch market detail + up to 40 trade rows from Panta.
 4. `buildMarketContext` assembles a snapshot where every missing field is the literal string
-   `"unavailable"` — the model is told what it does *not* know.
+   `"unavailable"`, the model is told what it does *not* know.
 5. Call Groq with a system prompt that forbids external facts, trade recommendations,
    guarantees and partisan framing, and demands strict JSON.
 6. Parse against a Zod schema. On failure, retry **once** with a repair instruction. On a
-   second failure, error out — malformed text is never rendered as trusted content.
+   second failure, error out, malformed text is never rendered as trusted content.
 
 Results are cached in the browser's `sessionStorage` keyed by market id. Nothing is stored
 server-side.
@@ -178,7 +178,7 @@ Tokens live in `@theme` in `src/app/globals.css` and are consumed as CSS variabl
 
 Background `#080B10`, surfaces `#0E131A` / `#131A23` / `#171F2A`, border `#222B36`, text
 `#F5F7FA`, muted `#8A96A8`, accent `#4FE0D0`. YES `#22C55E` and NO `#F43F5E` are **semantic
-only** — they mark outcomes and never brand surfaces.
+only**: they mark outcomes and never brand surfaces.
 
 Accessibility decisions that are load-bearing rather than cosmetic:
 

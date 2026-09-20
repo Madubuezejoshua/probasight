@@ -86,14 +86,14 @@ const MESSAGES: Record<string, string> = {
   NO_CREATOR_FEES: "There are no accumulated creator fees to claim on this market.",
   UPLOAD_NOT_CONFIGURED: "Panta's image upload service is unavailable right now.",
   TX_NOT_FOUND:
-    "Panta has not observed this transaction yet. It may still be propagating — retry shortly.",
+    "Panta has not observed this transaction yet. It may still be propagating. Retry shortly.",
   TX_FAILED: "The transaction failed on-chain.",
   TX_MISMATCH:
     "The transaction does not match the expected wallet, market or program for this action.",
   TX_FEE_MISMATCH: "The on-chain amount does not match the quoted amount.",
   RATE_LIMITED: "Panta rate limit reached. Wait a moment and try again.",
   UPSTREAM_TRANSIENT:
-    "Panta rejected that request without saying why, which it does intermittently under load. Nothing is wrong with your input — try again.",
+    "Panta rejected that request without saying why, which it does intermittently under load. Nothing is wrong with your input. Try again.",
   INTERNAL_ERROR: "Panta returned an internal error.",
   // Our own codes
   PANTA_NOT_CONFIGURED:
@@ -158,7 +158,7 @@ export function normalizePantaError(status: number, body: unknown): AppError {
    *
    * Verified against production: the identical request alternates between 200
    * and `400 {"code":"INVALID_MARKET_PARAMS"}` with no `field`, no `fields`
-   * and no `message`. Every genuine Panta validation failure carries detail —
+   * and no `message`. Every genuine Panta validation failure carries detail,
    * `{"message":"limit must be an integer","field":"limit"}` or
    * `{"fields":{"imageUrl":[...]}}`. Treating the detail-less form as a hard
    * user error told people their input was rejected when nothing was wrong

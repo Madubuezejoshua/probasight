@@ -6,7 +6,7 @@ import { UNAVAILABLE } from "./format";
  * The docs describe `startTime` / `endTime` / `resolutionTime` as integer Unix
  * seconds, but the live API returns ISO-8601 strings on catalog reads (verified
  * against production: `"2026-01-01T00:00:00Z"`). Both forms are accepted here
- * rather than trusting one and silently rendering "—" for the other.
+ * rather than trusting one and silently rendering "-" for the other.
  *
  * Note the asymmetry: market CREATION still sends integer Unix seconds, which is
  * what the create endpoint documents and accepts.

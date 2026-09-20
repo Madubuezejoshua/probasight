@@ -2,7 +2,7 @@
  * Panta API response types.
  *
  * Mirrors https://docs.panta.market/ exactly. Fields the docs mark as
- * `string | null` stay nullable here — the UI must render an honest
+ * `string | null` stay nullable here, the UI must render an honest
  * "unavailable" state rather than substituting a value.
  */
 
