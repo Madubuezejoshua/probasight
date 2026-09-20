@@ -56,9 +56,12 @@ replaced.
 
 | File | Change |
 | --- | --- |
-| `src/app/icon.svg` | Redrawn as the ProbaSight mark. |
-| `src/app/apple-icon.png` | **New.** 180x180 iOS home-screen icon. |
-| `public/brand/README.md` | **New.** Drop-in instructions for a supplied logo asset. |
+| `public/brand/probasight-mark.png` | **New.** The supplied ProbaSight logo, 512x512 RGBA. |
+| `src/app/favicon.ico` | **New.** The supplied favicon, 16/32/48 px entries. |
+| `src/app/apple-icon.png` | **New.** 180x180 iOS home-screen icon, generated from the supplied logo. |
+| `src/app/opengraph-image.png` | **New.** 1200x630 social preview card. |
+| `src/app/icon.svg` | **Deleted.** The interim generated mark, superseded by the supplied asset. |
+| `public/brand/README.md` | **New.** Asset locations and replacement instructions. |
 
 ### Documentation (7 files)
 
@@ -70,41 +73,49 @@ were not modified by the rebrand.
 
 ## Brand Assets Updated
 
-### The new mark
+### The supplied asset
 
-An original drawing: a **logistic (sigmoid) probability curve** with a **focal node at its
-inflection point**. The curve reads as forecasting and probability; the node is the
-"sight" the product is named for. It replaces the previous ECG-style pulse trace, which
-was tied to the old name.
+The ProbaSight logo and favicon were **provided by the project owner** and are the marks
+now in use: a teal bar chart with a forward arrow inside a ring. Both were inspected
+before adoption.
 
-Accent `#4FE0D0` on surface `#0E131A`, matching the existing dark-terminal theme. Not
-casino-like, not playful.
+| Asset | Source | Where it is used |
+| --- | --- | --- |
+| `public/brand/probasight-mark.png` | Supplied, 512x512 RGBA with alpha | Header and footer marks |
+| `src/app/favicon.ico` | Supplied, 3 entries (16, 32, 48 px, 32bpp) | Browser tab icon |
+| `src/app/apple-icon.png` | Generated from the supplied logo | iOS home screen, 180x180 |
+| `src/app/opengraph-image.png` | Generated from the supplied logo | Social preview, 1200x630 |
 
-**Legibility was verified by rendering, not assumed.** The icon was rasterised at 16, 32,
-48 and 180 px and inspected. The first geometry failed at 16 px (the node merged into the
-curve and it read as a plain diagonal line), so the punch-out gap was widened and the node
-enlarged (`stroke-width` 2.4 to 2.2, node `r` 2.4 to 3.0, gap `r` 3.6 to 4.3). The second
-geometry reads correctly at all four sizes.
+The favicon's three embedded bitmaps were decoded and rendered: the artwork matches the
+logo, and is legible at 32 and 48 px. The logo was rendered at its real display sizes
+(24, 28, 32, 48, 180 px) on both the dark theme background (`#080B10`) and a light
+background before being wired in.
 
-### Drop-in path for a supplied asset
+An interim mark drawn during this rebrand (a logistic curve with a focal node) was
+**discarded** in favour of the supplied asset, and `src/app/icon.svg` was deleted.
 
-`src/components/layout/Logo.tsx` exposes a single constant:
+### Serving cost
 
-```ts
-const BRAND_MARK_SRC: string | null = null;
-```
+The source PNG is 275 KB, which would otherwise be downloaded in full to paint a 28 px
+header icon on every page load. The mark is therefore rendered through `next/image`
+rather than a raw `<img>`.
 
-Point it at a file in `public/brand/` and the app uses that image instead of the inline
-SVG. The image renders with `object-contain` inside a square box, so **aspect ratio is
-always preserved**, never stretched or squashed. Left `null`, the inline SVG is used, so
-nothing breaks while `public/brand/` is empty. Full instructions in
-`public/brand/README.md`.
+Measured against the running production server:
 
-### Origin and independence
+| Request | Bytes |
+| --- | --- |
+| `/brand/probasight-mark.png` (source) | 275 KB |
+| `/_next/image?...&w=128&q=75` (what the browser actually gets) | **7 KB** |
 
-The mark is original and is **not** derived from any Panta asset. The footer continues to
-state that ProbaSight is an independent interface not operated or endorsed by Panta, and
-"Powered by Panta" remains a separate attribution element.
+The header instance sets `priority` (it is above the fold on every page); the footer
+instance lazy-loads. Both render with `object-contain` inside a square box, so the aspect
+ratio is preserved and the mark is never stretched or squashed.
+
+### Independence
+
+The mark is not a Panta asset and does not resemble one. The footer still states that
+ProbaSight is an independent interface not operated or endorsed by Panta, and
+"Powered by Panta" remains a separate element.
 
 ## Metadata Updated
 
@@ -119,8 +130,13 @@ Verified in the served HTML of the running production server, not read from sour
 | `og:title` | `ProbaSight: Prediction markets, understood` |
 | `og:description` | `Real-time Panta market intelligence, AI analysis, and on-chain trading in one terminal.` |
 | `og:site_name` | `ProbaSight` **(added)** |
-| `icon` | `/icon.svg` |
+| `og:image` | `/opengraph-image.png`, 1200x630, with `og:image:width` / `:height` **(added)** |
+| `icon` | `/favicon.ico` **(supplied asset)** |
 | `apple-touch-icon` | `/apple-icon.png`, 180x180 **(added)** |
+
+The explicit `icons` block was removed from `layout.tsx`; Next's file conventions
+(`app/favicon.ico`, `app/apple-icon.png`, `app/opengraph-image.png`) now generate the
+tags, which removes the risk of metadata and files disagreeing. Verified in served HTML.
 
 No technical claim in the description was changed or broadened.
 
@@ -212,37 +228,36 @@ identifies "Panta Pulse" explicitly as a *former* name, never as the current pro
 
 ## Tests
 
-All run after every rebrand change, against the restored dependency tree.
+All run after every change, against a tree installed from the lockfile.
 
 | Gate | Command | Result |
 | --- | --- | --- |
+| Clean install | `npm ci` | **PASS** - 473 packages, zero lockfile drift |
 | Lint | `npx eslint .` | **PASS** - 0 errors, 0 warnings |
 | Typecheck | `npx tsc --noEmit` | **PASS** - 0 errors |
-| Tests | `npx vitest run` | **PASS** - 133/133 passing, 10 files |
-| Build | `npx next build` | **PASS** - all 20 API routes plus `/icon.svg` and `/apple-icon.png` emitted |
-| Clean install | `npm ci` | **BLOCKED** - see below |
+| Tests | `npx vitest run` | **PASS** - 137/137 passing, 11 files |
+| Build | `npx next build` | **PASS** - all 20 API routes plus `/apple-icon.png` and `/opengraph-image.png` |
 
-No test was weakened, skipped or modified. No test referenced the product name, so none
-needed updating.
+No test was weakened, skipped or modified. Four tests were **added** (see below).
 
-### `npm ci` - BLOCKED, environment, not project
+### `npm ci` - resolved
 
-`npm ci` could not complete on this Windows machine. It deletes `node_modules` wholesale
-before reinstalling, and the OS refused to delete a loaded native binary:
+`npm ci` initially failed twice, rejected by the OS while deleting
+`node_modules\@next\swc-win32-x64-msvc
+ext-swc.win32-x64-msvc.node`.
 
-```
-node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node
-The operation was rejected by your operating system.
-```
+The cause was identified rather than worked around: a **stale `next start -p 3000`
+process** (PID 2788, started 00:30, left over from an earlier session) still had the
+native module loaded. Ending that process made `npm ci` succeed on the next attempt,
+installing all 473 packages with no lockfile drift. This was not an npm, packaging or
+platform fault.
 
-Attempted twice, failed identically both times, leaving `node_modules` partially removed
-(473 packages down to 61). Recovered both times with `npm install`.
+### The repo-integrity test earned its keep
 
-This is a Windows file-lock on a native module, not a packaging fault. The evidence that
-the renamed lockfile is valid is stronger than `npm ci` would have given: `npm install`
-reconciled `package.json` against `package-lock.json` and produced a diff of **exactly the
-two renamed `name` fields**, with no dependency, version or integrity-hash drift, and
-restored all 473 packages. Vercel builds on Linux, where this lock does not occur.
+`tests/repo-integrity.test.ts` failed during this pass because the newly written
+`tests/ai-question-refetch.test.ts` was not yet git-tracked. That is the same guard added
+after four API routes were silently excluded from the repository by an unanchored
+`.gitignore` pattern, and it behaved exactly as intended.
 
 ## Functional Regression Check
 
@@ -260,23 +275,49 @@ requests against the live Panta API and live Groq. Not a code read.
 | `/api/panta/categories` | **PASS** - HTTP 200 |
 | `/api/panta/markets` | **PASS** - HTTP 200, real market ids returned |
 | AI analysis | **PASS** - HTTP 200, full structured analysis from live Groq |
-| Favicon `/icon.svg` | **PASS** - HTTP 200 |
+| Favicon `/favicon.ico` | **PASS** - HTTP 200, supplied asset |
 | App icon `/apple-icon.png` | **PASS** - HTTP 200 |
+| Social card `/opengraph-image.png` | **PASS** - HTTP 200, 1200x630 |
+| Logo `/brand/probasight-mark.png` | **PASS** - HTTP 200, served optimised at 7 KB |
+| Old `/icon.svg` | **PASS** - HTTP 404, correctly gone |
 | "Powered by Panta" | **PASS** - present on all five pages |
 | Responsive layout | Unchanged - no layout code was touched |
 
-### Note on AI route intermittency (pre-existing, not a regression)
+### AI route: question-less market rows
 
-Repeated AI calls alternate between HTTP 200 with a full analysis and HTTP 422
-`MARKET_QUESTION_UNAVAILABLE`. This is the **existing** upstream Panta flakiness already
-recorded in `docs/QA_REPORT.md`: the market detail endpoint intermittently returns a row
-with both `title` and `description` empty, and `hasAnalysableQuestion` then correctly
-**refuses to analyse** rather than inferring a topic from category or oracle names.
+During this pass the AI route returned HTTP 422 `MARKET_QUESTION_UNAVAILABLE` on roughly
+half of repeated calls for the same market. Two findings came out of investigating it.
 
-That is the honest-refusal guard working as designed. Confirmed not caused by this
-rebrand: the only change under `src/lib/ai/` and `src/app/api/ai/` is one line in
-`SYSTEM_PROMPT` replacing the product name. `src/lib/ai/market-context.ts`, which holds
-the guard, is byte-for-byte unchanged.
+**1. It is not a rebrand regression.** The only change under `src/lib/ai/` or
+`src/app/api/ai/` at that point was one line of `SYSTEM_PROMPT` replacing the product
+name. `src/lib/ai/market-context.ts`, which holds the guard, was byte-for-byte unchanged.
+
+**2. Many Panta markets genuinely have no question text.** Checking the detail endpoint
+for 12 consecutive catalog rows: **7 of 12 returned an empty `title` AND empty
+`description`**, persistently, across repeated calls. For those markets the 422 is the
+correct and honest answer, not a bug. `hasAnalysableQuestion` refuses rather than letting
+the model infer a question from category or oracle-feed names, which is exactly the
+hallucination `tests/ai-guard.test.ts` was written to prevent.
+
+**Mitigation added.** For the case where a populated row and an empty row alternate for
+the same id, the route now re-fetches before refusing (`QUESTION_ATTEMPTS = 3`, backoff
+200/500 ms). The client's existing transient retry cannot cover this, because the bad
+response is an HTTP 200 with empty fields rather than an error code.
+
+The refusal is **not** weakened: if the question is still missing after the attempts, the
+request is refused exactly as before.
+
+**Covered by four new tests** in `tests/ai-question-refetch.test.ts`: a populated first
+response is used with no extra call; a later populated response wins; a genuinely
+question-less market is still refused; and the attempts are bounded rather than looping.
+The tests were confirmed to have teeth by temporarily setting `QUESTION_ATTEMPTS = 1`,
+which made two of them fail.
+
+**Honest limit:** after the fix, behaviour is deterministic in live testing - a market
+with question text returned 200 on 4/4 calls (the 5th was a correct 429 from the rate
+limiter), and a market without returned 422 on 6/6. The alternating behaviour observed
+earlier **did not reproduce**, so the re-fetch is proven by unit test but was not
+observed rescuing a live call.
 
 ### Not verifiable here
 
@@ -287,22 +328,20 @@ touched the transaction, signing or broadcast path.
 
 ## Remaining Manual Actions
 
-1. **Supply the ProbaSight logo asset.** Drop it in `public/brand/` and set
-   `BRAND_MARK_SRC` in `src/components/layout/Logo.tsx`. The inline SVG mark works today,
-   so this is optional polish rather than a blocker. See `public/brand/README.md`.
+1. **GitHub repository name.** The remote is still
+   `github.com/Madubuezejoshua/Panta-Pulse.git`. Renaming is a GitHub-side action and
+   GitHub redirects the old URL, so nothing breaks either way. No file in this repository
+   hardcodes the URL, so a rename needs no code change.
 
-2. **Open Graph image.** No `og:image` exists, before or after this rebrand. Social shares
-   will show no preview card. Add one at 1200x630 and reference it in `layout.tsx`.
+2. **Panta API account and key labels.** The live key was registered with Panta under the
+   old name. `docs/REQUIRED_KEYS.md` now says `probasight`, which is correct for a fresh
+   registration, but an already-issued key keeps the label it was minted with. Cosmetic,
+   visible only in the Panta dashboard, no functional effect.
 
-3. **GitHub repository name.** The remote is still
-   `github.com/Madubuezejoshua/Panta-Pulse.git`. Renaming it is a GitHub-side action;
-   GitHub redirects the old URL, so nothing breaks either way. No document in this
-   repository hardcodes the repository URL, so a rename requires no code change.
+3. **Vercel project name.** Cosmetic, affects only the default deployment URL.
 
-4. **Panta API account and key labels.** The existing live key was registered with Panta
-   under the old name. The setup instructions in `docs/REQUIRED_KEYS.md` now say
-   `probasight`, which is correct for a fresh registration, but the already-issued key
-   keeps whatever label it was minted with. This is cosmetic, visible only in the Panta
-   dashboard, and does not affect function. Re-label or re-mint at your discretion.
+### Closed in this pass
 
-5. **Vercel project name.** Cosmetic, affects only the default deployment URL.
+- ~~Supply the ProbaSight logo asset~~ - supplied and wired in.
+- ~~Open Graph image~~ - `src/app/opengraph-image.png`, 1200x630, verified served.
+- ~~`npm ci` blocked~~ - stale process identified and ended; `npm ci` passes.

@@ -62,7 +62,7 @@ export function Header() {
           className="flex shrink-0 items-center gap-2"
           aria-label="ProbaSight home"
         >
-          <ProbaSightMark className="h-7 w-7" />
+          <ProbaSightMark className="h-7 w-7" priority />
           <ProbaSightWordmark className="hidden text-[15px] sm:inline" />
         </Link>
 

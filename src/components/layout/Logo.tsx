@@ -1,63 +1,42 @@
+import Image from "next/image";
+
 /**
  * ProbaSight brand marks.
  *
- * The glyph is an original drawing: a logistic (sigmoid) probability curve with
- * a focal node at its inflection point. The curve reads as forecasting, the
- * node as the "sight" the product is named for. Nothing here is derived from
- * any third-party brand asset, and in particular this is NOT a Panta mark.
- * Panta attribution is a separate element, `PoweredByPanta`.
+ * The mark is the supplied ProbaSight asset in `public/brand/`. It is rendered
+ * through `next/image` rather than a raw <img>: the source file is 512x512 and
+ * ~276 KB, which would otherwise be downloaded in full to paint a 28px header
+ * icon on every page. Next serves a resized, modern-format derivative instead.
  *
- * DROP-IN IMAGE ASSET
- * -------------------
- * Set BRAND_MARK_SRC to a file under `public/brand/` (see `public/brand/README.md`)
- * to render a supplied image instead of the inline SVG. The image is drawn with
- * `object-contain` inside a square box, so its aspect ratio is always preserved:
- * it is never stretched or squashed. Leaving it null keeps the inline SVG, which
- * is resolution-independent and follows the theme tokens.
+ * `object-contain` inside a square box keeps the aspect ratio in all cases, so
+ * the mark is never stretched or squashed regardless of the source dimensions.
+ *
+ * This is NOT a Panta mark. Panta attribution is a separate element rendered by
+ * `src/components/common/PoweredByPanta.tsx`. See `public/brand/README.md`.
  */
-const BRAND_MARK_SRC: string | null = null;
+const BRAND_MARK_SRC = "/brand/probasight-mark.png";
 
-export function ProbaSightMark({ className = "h-7 w-7" }: { className?: string }) {
-  if (BRAND_MARK_SRC) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element -- fixed-size brand mark, no layout shift to optimise
-      <img
-        src={BRAND_MARK_SRC}
-        alt=""
-        aria-hidden="true"
-        className={`${className} object-contain`}
-      />
-    );
-  }
+/** Rendered at 2x the largest display size (28px) so it stays sharp on retina. */
+const MARK_INTRINSIC_PX = 64;
 
+export function ProbaSightMark({
+  className = "h-7 w-7",
+  priority = false,
+}: {
+  className?: string;
+  /** Set on the header mark, which is in the initial viewport on every page. */
+  priority?: boolean;
+}) {
   return (
-    <svg className={className} viewBox="0 0 28 28" fill="none" role="img" aria-label="ProbaSight">
-      <rect
-        x="0.75"
-        y="0.75"
-        width="26.5"
-        height="26.5"
-        rx="7.25"
-        fill="var(--color-surface-2)"
-        stroke="var(--color-border-strong)"
-        strokeWidth="1.5"
-      />
-      {/* Logistic curve: flat at both ends, steep through the middle. */}
-      <path
-        d="M4.5 20.5C11.5 20.5 14.5 7.5 23.5 7.5"
-        stroke="var(--color-accent)"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      />
-      {/* Focal node at the curve's inflection, punched out from the curve. */}
-      <circle
-        cx="13.25"
-        cy="14"
-        r="4.3"
-        fill="var(--color-surface-2)"
-      />
-      <circle cx="13.25" cy="14" r="3" fill="var(--color-accent)" />
-    </svg>
+    <Image
+      src={BRAND_MARK_SRC}
+      alt=""
+      aria-hidden="true"
+      width={MARK_INTRINSIC_PX}
+      height={MARK_INTRINSIC_PX}
+      priority={priority}
+      className={`${className} object-contain`}
+    />
   );
 }
 

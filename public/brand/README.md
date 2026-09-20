@@ -1,45 +1,47 @@
 # ProbaSight brand assets
 
-Drop a supplied logo file here and the app will use it in place of the inline SVG mark.
+## In use
 
-## Expected paths
-
-| File | Used for |
+| File | Role |
 | --- | --- |
-| `probasight-mark.svg` or `.png` | Square symbol only. Header, footer, favicon. **Preferred.** |
-| `probasight-wordmark.svg` or `.png` | "ProbaSight" lettering only, no symbol. |
-| `probasight-logo.svg` or `.png` | Symbol plus lettering, horizontal lockup. |
+| `probasight-mark.png` | The ProbaSight symbol, 512x512 RGBA. Header and footer marks. |
 
-SVG is preferred over PNG: it stays sharp at every size and needs no retina variant.
-If supplying PNG, provide the mark at **512x512** or larger, with a transparent background.
-
-## How to switch the app over
-
-One line, in [`src/components/layout/Logo.tsx`](../../src/components/layout/Logo.tsx):
+The mark is referenced by [`src/components/layout/Logo.tsx`](../../src/components/layout/Logo.tsx)
+via a single constant:
 
 ```ts
-const BRAND_MARK_SRC: string | null = "/brand/probasight-mark.svg";
+const BRAND_MARK_SRC = "/brand/probasight-mark.png";
 ```
 
-The mark is rendered inside a square box with `object-contain`, so the aspect ratio is
-always preserved. A non-square asset is letterboxed rather than stretched or squashed.
+It is rendered through `next/image`, not a raw `<img>`. The source file is ~276 KB, and a
+raw tag would download all of it to paint a 28 px header icon on every page; Next serves a
+resized modern-format derivative instead (measured: 7 KB at `w=128`). `object-contain`
+inside a square box preserves the aspect ratio, so the mark is never stretched or squashed.
 
-Leaving the constant `null` keeps the built-in inline SVG, which follows the theme
-tokens and is resolution-independent. Nothing breaks if this directory stays empty.
+## Icons (separate files, not driven by the constant above)
 
-## Favicon and app icon
+| File | Role |
+| --- | --- |
+| `src/app/favicon.ico` | Browser tab icon. Three entries: 16, 32 and 48 px. |
+| `src/app/apple-icon.png` | iOS home-screen icon, 180x180, opaque dark background. |
+| `src/app/opengraph-image.png` | Social preview card, 1200x630. |
 
-These are generated from separate files and are **not** switched by the constant above:
+These use Next's App Router file conventions, so Next generates the `<link>` and
+`<meta property="og:image">` tags automatically. `layout.tsx` deliberately does **not**
+declare an `icons` block, so the files cannot disagree with the metadata.
 
-- `src/app/icon.svg` - browser favicon
-- `src/app/apple-icon.png` - 180x180 iOS home-screen icon
+## Replacing an asset
 
-Replace those two directly if the supplied asset should become the icon as well. Use the
-**symbol only**, never the wordmark: lettering is unreadable at 16x16.
+1. Drop the new file in, keeping the same path and filename.
+2. For the mark, any square-ish image works; update `BRAND_MARK_SRC` only if you change
+   the filename.
+3. For icons, use the **symbol only**, never the wordmark: lettering is unreadable at
+   16x16. Regenerate `apple-icon.png` (180x180, opaque background, iOS ignores alpha) and
+   `opengraph-image.png` (1200x630) to match.
+4. Check the result on the dark theme background (`#080B10`), which is the default.
 
-## Constraints
+## Constraint
 
-- The ProbaSight logo must not reuse or resemble a Panta logo. ProbaSight is an
-  independent product built on the Panta API; Panta attribution is a separate element
-  rendered by `src/components/common/PoweredByPanta.tsx`.
-- Check any new asset on a dark background (`#080B10`), since the UI is dark by default.
+The ProbaSight logo must not reuse or resemble a Panta logo. ProbaSight is an independent
+product built on the Panta API; Panta attribution is a separate element rendered by
+`src/components/common/PoweredByPanta.tsx`.
