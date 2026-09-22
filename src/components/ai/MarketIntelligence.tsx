@@ -142,7 +142,13 @@ function LoadingSkeleton() {
 function AnalysisView({ data }: { data: MarketAnalysisResponse }) {
   const { analysis } = data;
   return (
-    <div className="pp-fade space-y-5">
+    // The model quotes on-chain identifiers verbatim, e.g. a 44-character base58
+    // oracle address. With no break opportunity inside it, that one token set the
+    // minimum width of its grid column and pushed the YES/NO cards ~100px past a
+    // 360px screen, where the card's overflow-hidden clipped them.
+    // `overflow-wrap: anywhere` is inherited by every block below and, unlike
+    // `break-word`, also shrinks min-content width, so the grids can fit.
+    <div className="pp-fade min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <Block title="Summary">
         <p className="text-sm leading-relaxed text-[var(--color-text)]">{analysis.summary}</p>
       </Block>
@@ -190,7 +196,7 @@ function AnalysisView({ data }: { data: MarketAnalysisResponse }) {
 
 function Block({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div>
+    <div className="min-w-0">
       <h3 className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-[var(--color-faint)]">
         {title}
       </h3>
@@ -211,7 +217,7 @@ function CaseCard({
   const isYes = tone === "yes";
   return (
     <div
-      className={`rounded-[var(--radius-control)] border p-3.5 ${
+      className={`min-w-0 rounded-[var(--radius-control)] border p-3.5 ${
         isYes
           ? "border-[var(--color-yes)]/25 bg-[var(--color-yes-dim)]/30"
           : "border-[var(--color-no)]/25 bg-[var(--color-no-dim)]/30"
@@ -233,7 +239,7 @@ function CaseCard({
                 isYes ? "bg-[var(--color-yes)]" : "bg-[var(--color-no)]"
               }`}
             />
-            {item}
+            <span className="min-w-0 flex-1">{item}</span>
           </li>
         ))}
       </ul>
@@ -262,7 +268,7 @@ function BulletList({
           <span aria-hidden className="mt-0.5 shrink-0 font-mono text-[10px] opacity-60">
             {marker}
           </span>
-          {item}
+          <span className="min-w-0 flex-1">{item}</span>
         </li>
       ))}
     </ul>

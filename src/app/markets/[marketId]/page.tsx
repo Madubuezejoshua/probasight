@@ -175,8 +175,11 @@ export default async function MarketDetailPage({ params }: PageProps) {
               />
             </dl>
 
-            <div className="mt-4 flex items-center justify-between border-t border-[var(--color-border-subtle)] pt-3">
-              <span className="font-mono text-[10px] text-[var(--color-faint)]">
+            {/* The market id is a 44-character base58 string with no break
+                opportunity. Without wrapping, at 320px it pushed "Powered by
+                Panta" past the screen edge and scrolled the page sideways. */}
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 border-t border-[var(--color-border-subtle)] pt-3">
+              <span className="min-w-0 font-mono text-[10px] text-[var(--color-faint)] [overflow-wrap:anywhere]">
                 {market.marketId}
               </span>
               <PoweredByPanta variant="subtle" />
