@@ -21,6 +21,15 @@ export type ListMarketsParams = {
   createdBy?: "me";
   cursor?: string;
   limit?: number;
+  /**
+   * Bypass the shared cache for this call.
+   *
+   * Opt-in, so /markets and every other caller keeps its 30s cache. The
+   * homepage hero uses it because it decides whether a market is still open
+   * for trading, and deciding that from a catalog page up to 30s old can put a
+   * just-closed market in the hero.
+   */
+  fresh?: boolean;
 };
 
 export async function listMarkets(params: ListMarketsParams = {}): Promise<PantaMarketsList> {
@@ -33,15 +42,19 @@ export async function listMarkets(params: ListMarketsParams = {}): Promise<Panta
       cursor: params.cursor,
       limit: params.limit ? Math.min(Math.max(params.limit, 1), 50) : undefined,
     },
-    revalidate: params.createdBy ? false : LIST_REVALIDATE_SECONDS,
+    revalidate: params.createdBy || params.fresh ? false : LIST_REVALIDATE_SECONDS,
   });
   return { items: data?.items ?? [], nextCursor: data?.nextCursor ?? null };
 }
 
-export async function getMarket(marketId: string): Promise<PantaMarket> {
+/** `fresh` bypasses the 10s cache; see the note on `ListMarketsParams.fresh`. */
+export async function getMarket(
+  marketId: string,
+  options: { fresh?: boolean } = {},
+): Promise<PantaMarket> {
   const { data } = await pantaRequest<PantaMarket>({
     path: `/markets/${encodeURIComponent(marketId)}/`,
-    revalidate: DETAIL_REVALIDATE_SECONDS,
+    revalidate: options.fresh ? false : DETAIL_REVALIDATE_SECONDS,
   });
   return data;
 }

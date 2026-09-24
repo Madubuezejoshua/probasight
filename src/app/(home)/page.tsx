@@ -4,11 +4,17 @@ import { PoweredByPanta } from "@/components/common/PoweredByPanta";
 import { EmptyState, ErrorState } from "@/components/common/States";
 import { IntelligenceShowcase } from "@/components/ai/IntelligenceShowcase";
 import { HeroIntelligenceCard } from "@/components/home/HeroIntelligenceCard";
+import {
+  buildHeroCandidates,
+  hasUsableName,
+  selectHeroMarket,
+} from "@/lib/home/hero-selection";
+import { isLiveTradableMarket } from "@/lib/panta/live";
 import { enrichMarketsWithPrices } from "@/lib/panta/enrich";
 import { getMarket, getMarketTrades, listMarkets } from "@/lib/panta/markets";
 import { toAppError } from "@/lib/panta/errors";
 import type { ApiErrorShape } from "@/lib/client-api";
-import type { PantaCatalogTrade, PantaMarket } from "@/lib/panta/types";
+import type { PantaMarket } from "@/lib/panta/types";
 
 export const dynamic = "force-dynamic";
 
@@ -16,41 +22,6 @@ const FEATURED_COUNT = 6;
 
 /** Trade rows pulled for the hero card's signal strip. */
 const HERO_TRADE_SAMPLE = 40;
-
-/** A market a visitor can actually read: it has a title or a description. */
-function hasUsableName(market: PantaMarket): boolean {
-  return Boolean(market.title?.trim() || market.description?.trim());
-}
-
-/** Both sides priced. Panta returns pricing on detail, not on catalog rows. */
-function hasPricing(market: PantaMarket): boolean {
-  return (
-    market.yesPrice !== null &&
-    market.yesPrice !== undefined &&
-    market.noPrice !== null &&
-    market.noPrice !== undefined
-  );
-}
-
-/**
- * Overlays `next` onto `base`, ignoring keys whose new value is null,
- * undefined or an empty string.
- *
- * Panta's detail and catalog rows are each authoritative for different fields:
- * detail carries YES/NO pricing that list rows never have, while a list row can
- * carry a volume that the detail row returns as null. Preferring whichever
- * response actually has a value keeps both rather than letting the later one
- * blank out the earlier.
- */
-function mergeDefined(base: PantaMarket, next: PantaMarket): PantaMarket {
-  const merged: Record<string, unknown> = { ...base };
-  for (const [key, value] of Object.entries(next)) {
-    if (value !== null && value !== undefined && value !== "") {
-      merged[key] = value;
-    }
-  }
-  return merged as PantaMarket;
-}
 
 /**
  * Reads market detail, retrying while it comes back with nothing filled in.
@@ -69,32 +40,40 @@ const HERO_DETAIL_ATTEMPTS = 3;
 const HERO_DETAIL_BACKOFF_MS = [150, 400];
 
 async function getHeroDetail(marketId: string): Promise<PantaMarket> {
-  let detail = await getMarket(marketId);
+  // `fresh` because this read also decides whether the market is still open.
+  let detail = await getMarket(marketId, { fresh: true });
   for (let attempt = 1; attempt < HERO_DETAIL_ATTEMPTS; attempt += 1) {
     if (detail.yesPrice !== null && detail.yesPrice !== undefined) return detail;
     await new Promise((resolve) =>
       setTimeout(resolve, HERO_DETAIL_BACKOFF_MS[attempt - 1] ?? 400),
     );
-    detail = await getMarket(marketId);
+    detail = await getMarket(marketId, { fresh: true });
   }
   return detail;
 }
 
 export default async function HomePage() {
   let featured: PantaMarket[] = [];
+  /** Every catalog row, enriched where we have it, for the hero draw. */
+  let heroPool: PantaMarket[] = [];
+  let anyLive = false;
   let error: ApiErrorShape | null = null;
 
   try {
     // Prefer tradable markets for the featured rail; fall back to the general
-    // catalog if the primary phase is empty right now. Pull a wider page than we
-    // display so the curation below has something to work with.
+    // catalog if nothing is currently open. Pull a wider page than we display
+    // so the curation below has something to work with.
     // Panta's `status` parameter does not filter by phase reliably against the
     // live catalog (status=primary returns cancelled and resolved rows too), so
-    // the catalog is fetched unfiltered and phase is applied here on the real
-    // `phase` field. Falls back to any phase if nothing is currently tradable.
-    const catalog = await listMarkets({ limit: 50 });
-    const tradable = catalog.items.filter((m) => m.phase === "primary");
-    const source = tradable.length > 0 ? tradable : catalog.items;
+    // the catalog is fetched unfiltered and liveness is decided here from the
+    // real `phase`, `resolved` and `endTime` fields.
+    // `fresh` skips the shared 30s cache: this response decides which markets
+    // are still open, and a catalog page half a minute old can put a market
+    // that has just closed into the hero.
+    const catalog = await listMarkets({ limit: 50, fresh: true });
+    const live = catalog.items.filter((m) => isLiveTradableMarket(m));
+    anyLive = live.length > 0;
+    const source = anyLive ? live : catalog.items;
 
     // Some live catalog rows carry neither a title nor a description. Those are
     // still real markets and remain listed on /markets, but a card that can only
@@ -105,6 +84,13 @@ export default async function HomePage() {
     const ordered = [...named, ...unnamed].slice(0, FEATURED_COUNT);
 
     featured = await enrichMarketsWithPrices(ordered, FEATURED_COUNT);
+
+    // The hero draws from the WHOLE catalog, not just the six featured rows,
+    // so the rotation pool is as wide as Panta allows. Enriched rows are
+    // overlaid where we have them, which is the only place pricing exists at
+    // this point and therefore the only way the pricing preference can bite.
+    const enriched = new Map(featured.map((m) => [m.marketId, m]));
+    heroPool = catalog.items.map((m) => enriched.get(m.marketId) ?? m);
   } catch (err) {
     const appError = toAppError(err);
     error = {
@@ -115,47 +101,33 @@ export default async function HomePage() {
     };
   }
 
-  // The AI showcase links to one real market, so pick one a visitor can read.
-  const showcaseMarket = featured.find((m) => hasUsableName(m)) ?? featured[0] ?? null;
-
-  // Hero card subject, in order of preference: readable and tradable and
-  // already priced, then readable and tradable, then merely readable.
-  //
-  // Pricing is a PREFERENCE, never a requirement. The enrichment that supplies
-  // it is best-effort and drops out when Panta's detail endpoint is having a
-  // bad minute, so requiring it made the entire card disappear and left the
-  // hero lopsided. Preferring it means the card usually leads with a fully
-  // populated market, and otherwise still renders with its honest
-  // "no pricing right now" state.
-  let heroMarket =
-    featured.find((m) => hasUsableName(m) && m.phase === "primary" && hasPricing(m)) ??
-    featured.find((m) => hasUsableName(m) && m.phase === "primary") ??
+  // The AI showcase invites the visitor to try a live market, so prefer one.
+  const showcaseMarket =
+    featured.find((m) => hasUsableName(m) && isLiveTradableMarket(m)) ??
     featured.find((m) => hasUsableName(m)) ??
+    featured[0] ??
     null;
 
-  // The tape drives the signal strip. Detail is re-read here because catalog
-  // rows carry no pricing and the list enrichment may have missed it; the
-  // detail row is authoritative. Neither failure may take down the hero, so
-  // each degrades to an explicit state on the card.
-  let heroTrades: PantaCatalogTrade[] = [];
-  let heroTradesUnavailable = false;
-  if (heroMarket) {
-    const [detail, tape] = await Promise.allSettled([
-      getHeroDetail(heroMarket.marketId),
-      getMarketTrades(heroMarket.marketId, HERO_TRADE_SAMPLE),
-    ]);
-    if (detail.status === "fulfilled") {
-      // Merge field by field, keeping the catalog value wherever detail has
-      // none. A plain spread lets a null/undefined detail field blank out a
-      // value the list row did have, which wiped volume off the card.
-      heroMarket = mergeDefined(heroMarket, detail.value);
-    }
-    if (tape.status === "fulfilled") {
-      heroTrades = tape.value.items;
-    } else {
-      heroTradesUnavailable = true;
-    }
-  }
+  // Hero card subject.
+  //
+  // Drawn at RANDOM from every live, readable market rather than taken with
+  // `.find()`. The old find-first logic pinned whichever eligible row Panta
+  // happened to return first, so one market could occupy the hero for days.
+  //
+  // There is deliberately no fallback to a closed market. The hero frames its
+  // market as live, so showing a resolved, cancelled or expired one would be a
+  // false claim; if nothing qualifies the card is simply not rendered.
+  //
+  // The tape drives the signal strip, and detail is re-read because catalog
+  // rows carry no pricing. Detail is also the freshest liveness signal, so a
+  // candidate that closed since the catalog read is discarded and the next one
+  // tried, bounded by MAX_HERO_ATTEMPTS.
+  const hero = await selectHeroMarket({
+    candidates: buildHeroCandidates(heroPool, { random: Math.random }),
+    fetchDetail: getHeroDetail,
+    fetchTrades: async (marketId) =>
+      (await getMarketTrades(marketId, HERO_TRADE_SAMPLE)).items,
+  });
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 sm:px-6">
@@ -193,18 +165,31 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Right column. Rendered only when Panta actually gave us a market
-              worth showing; the hero simply returns to one column otherwise
-              rather than displaying an empty shell. */}
-          {heroMarket ? (
+          {/* Right column. Only ever a live market. When nothing is open the
+              card is replaced by a one-line honest note rather than by a
+              closed market dressed up as live. */}
+          {hero ? (
             <div className="w-full lg:max-w-[520px] lg:justify-self-end">
               <HeroIntelligenceCard
-                market={heroMarket}
-                trades={heroTrades}
-                tradesUnavailable={heroTradesUnavailable}
+                market={hero.market}
+                trades={hero.trades}
+                tradesUnavailable={hero.tradesUnavailable}
               />
             </div>
-          ) : null}
+          ) : error ? null : (
+            <div className="w-full lg:max-w-[520px] lg:justify-self-end">
+              <p className="pp-card px-4 py-3 text-sm text-[var(--color-muted)]">
+                No live market available right now.{" "}
+                <Link
+                  href="/markets"
+                  className="font-medium text-[var(--color-accent)] transition-colors hover:text-[var(--color-accent-bright)]"
+                >
+                  Browse the full catalog
+                </Link>
+                .
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -215,8 +200,13 @@ export default async function HomePage() {
             <h2 className="text-lg font-semibold tracking-tight sm:text-xl">
               Trending markets
             </h2>
+            {/* The rail falls back to closed markets when nothing is open, so
+                the wording has to follow the data rather than always claiming
+                "live". */}
             <p className="mt-1 text-sm text-[var(--color-muted)]">
-              Live from the Panta catalog, with current YES/NO pricing.
+              {anyLive
+                ? "Live from the Panta catalog, with current YES/NO pricing."
+                : "From the Panta catalog. No markets are open for trading right now."}
             </p>
           </div>
           <Link
