@@ -132,6 +132,7 @@ decisions:
 | Resolved market | Settlement (1/0), never a stale spot price |
 | AI has no data for a section | The prompt requires it to say so; empty arrays fail schema validation |
 | Panta key missing | `PANTA_NOT_CONFIGURED` error state, never placeholder markets |
+| No market is open for trading | Homepage hero renders an honest note, never a resolved or expired market dressed as live |
 
 Every formatter returns `N/A` for missing input rather than a substituted zero.
 
@@ -163,6 +164,7 @@ server-side.
 | Categories | 3600s revalidate | Effectively static allowlist |
 | Market list | 30s revalidate | Public, changes slowly |
 | Market detail | 10s revalidate | Public but carries live prices |
+| Homepage hero reads | `no-store` (opt-in `fresh`) | These decide whether a market is still open; a cached page can surface a just-closed market |
 | Positions, wallet trades | `no-store` | Wallet-scoped; must never be shared |
 | All mutations | `no-store` | Obviously |
 | AI analysis | Browser session only | On demand, never automatic |

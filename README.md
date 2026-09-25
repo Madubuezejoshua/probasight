@@ -9,24 +9,46 @@ and claim creator fees, all non-custodially.
 
 Powered by Panta.
 
+| | |
+| --- | --- |
+| **Live app** | <https://probasight.vercel.app> |
+| **Source** | <https://github.com/Madubuezejoshua/probasight> |
+
 ---
 
 ## Contents
 
+- [The problem](#the-problem)
 - [What this is](#what-this-is)
+- [Core features](#core-features)
 - [Architecture](#architecture)
+- [Tech stack](#tech-stack)
 - [Prerequisites](#prerequisites)
 - [Install](#install)
 - [Environment setup](#environment-setup)
 - [Run in development](#run-in-development)
 - [Production build](#production-build)
 - [Panta integration](#panta-integration)
+- [AI Market Intelligence](#ai-market-intelligence)
 - [Wallet security model](#wallet-security-model)
 - [Routes](#routes)
 - [Testing](#testing)
 - [Deployment](#deployment)
 - [Attribution requirement](#attribution-requirement)
 - [Known limitations](#known-limitations)
+
+---
+
+## The problem
+
+A prediction market is only as useful as your ability to read it. Panta exposes the
+markets, the pricing and the settlement, but a raw catalog leaves the hard part to the
+user: what does this market actually ask, what does the current price imply, who has been
+trading it, and what would have to happen for each side to win.
+
+Most interfaces answer that with either nothing or a number pulled from thin air.
+ProbaSight answers it with structured analysis derived only from that market's own Panta
+data, and refuses to answer when the data cannot support one.
 
 ---
 
@@ -45,6 +67,23 @@ A single Next.js application with five pages and a server-side Panta integration
 There is **no user database, no login, and no custody**. A connected Solana wallet is the
 user's identity for everything wallet-scoped. Panta is the source of truth for markets,
 prices, positions and settlement; Solana is the source of truth for transactions.
+
+---
+
+## Core features
+
+- **Market discovery.** The live Panta catalog with category, phase and text filtering, and
+  readable YES/NO pricing enriched from market detail.
+- **AI Market Intelligence.** A structured, balanced read of a single market, generated on
+  demand from that market's own Panta snapshot. See [below](#ai-market-intelligence).
+- **Trading.** Quote, build, sign in your own wallet, broadcast, confirm, and report the
+  trade to Panta for volume attribution.
+- **Portfolio.** Open positions, estimated value where a price reference exists, wallet
+  activity, and claimable winnings.
+- **Market creation.** Form with live preview, a real Panta fee quote, wallet signature and
+  registration, plus creator-fee claims for markets you created.
+- **Honest empty states.** Where Panta has no data, the UI says so rather than substituting
+  a zero or an invented number.
 
 ---
 
@@ -106,6 +145,23 @@ src/
 tests/         unit tests (Vitest)
 docs/          architecture, demo script, submission, keys, QA, traction
 ```
+
+---
+
+## Tech stack
+
+| Layer | Choice |
+| --- | --- |
+| Framework | Next.js 15 (App Router, React 19, Server Components) |
+| Language | TypeScript, strict |
+| Styling | Tailwind CSS v4 with `@theme` design tokens |
+| Wallet | `@solana/wallet-adapter` (Phantom, Solflare) |
+| Chain | `@solana/web3.js`, v0 `VersionedTransaction` |
+| Market data | Panta public API |
+| AI | Groq, JSON mode, schema-validated |
+| Validation | Zod on every mutating route |
+| Tests | Vitest |
+| Hosting | Vercel |
 
 ---
 
@@ -238,6 +294,28 @@ Win claims and primary buys are reported to `POST /trades/` for volume attributi
 
 ---
 
+## AI Market Intelligence
+
+Analysis is generated on demand, never automatically, and is billed per call. The result is
+cached in the browser's `sessionStorage` for the session so revisiting a market does not
+re-bill the model.
+
+The model sees exactly one thing: a snapshot assembled server-side from that market's own
+Panta data, its catalog fields, phase, YES/NO pricing, timing, resolution metadata and
+recent trade tape. **There is no news feed and no web search**, which is why the default
+model must not be a `groq/compound*` variant, those have browsing built in and would break
+the guarantee that the analysis is grounded only in the snapshot.
+
+The output is Zod-validated against a fixed schema (summary, current market view, activity
+analysis, YES case, NO case, key uncertainties, data limitations). Malformed output gets one
+repair attempt before erroring. The prompt requires the model to state what the data cannot
+support rather than fill the gap, to present both sides, and never to recommend a trade.
+
+If a market has no question text in Panta's catalog, analysis is **refused** rather than
+inferred from the category or oracle feed names.
+
+---
+
 ## Wallet security model
 
 - ProbaSight **never** asks for, receives, stores or transmits a private key or seed phrase.
@@ -287,8 +365,6 @@ Unit coverage focuses on the logic where a silent bug would be most costly:
 - AI JSON schema parsing and rejection of malformed/partial output
 - Zod route-input validation
 - Solana instruction decoding, v0 compilation and signing-error classification
-
-See `docs/QA_REPORT.md` for the full record of what was executed and what remains.
 
 **Automated tests never spend funds.** No test signs a transaction, executes a trade, or
 creates a paid market.

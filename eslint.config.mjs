@@ -10,7 +10,7 @@ import { FlatCompat } from "@eslint/eslintrc";
  * this to a direct import unless the project moves to Next 16, whose config
  * package does export real flat arrays, and note that Next 16 also enables
  * `react-hooks/set-state-in-effect`, which this codebase does not currently
- * satisfy. See REPORT.md §15 (Bug 20) for the full reasoning.
+ * satisfy.
  */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
